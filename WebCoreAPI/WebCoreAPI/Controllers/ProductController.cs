@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebCoreAPI.Models;
+using WebCoreAPI.Services;
 
 namespace WebCoreAPI.Controllers
 {
@@ -9,26 +10,21 @@ namespace WebCoreAPI.Controllers
     {
         private readonly ILogger<ProductController> _logger;
         private readonly IConfiguration _configuration;
-        public ProductController(ILogger<ProductController> logger, IConfiguration configuration)
+        private readonly IProductService   _productService;
+        public ProductController(ILogger<ProductController> logger, 
+            IConfiguration configuration,
+            IProductService productService)
         {
             _logger = logger;
             _configuration = configuration;
+            _productService = productService;
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            var connectionString = _configuration.GetConnectionString("DefaultConnection");
-            var products = new List<Product>
-            {
-                new Product
-                {
-                    Id= Guid.NewGuid(),
-                    Name ="product1",
-                    Price = 1000
-                }
-            };
-            return Ok(connectionString);
+            var result = await _productService.GetAll();
+            return Ok(result);
         }
 
         [HttpGet("{id}")]

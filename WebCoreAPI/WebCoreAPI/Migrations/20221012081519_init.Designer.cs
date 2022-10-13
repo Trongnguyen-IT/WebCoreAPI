@@ -11,7 +11,7 @@ using WebCoreAPI.Data;
 
 namespace WebCoreAPI.Migrations
 {
-    [DbContext(typeof(WebDbContent))]
+    [DbContext(typeof(WebDbContext))]
     [Migration("20221012081519_init")]
     partial class init
     {

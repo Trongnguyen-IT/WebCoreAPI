@@ -5,7 +5,7 @@ namespace WebCoreAPI.Data
 {
     public static class DbInitializer
     {
-        public static void Initialize(WebDbContent context)
+        public static void Initialize(WebDbContext context)
         {
             context.Database.EnsureCreated();
 

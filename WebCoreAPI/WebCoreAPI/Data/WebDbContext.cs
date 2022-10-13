@@ -2,9 +2,9 @@
 
 namespace WebCoreAPI.Data
 {
-    public class WebDbContent : DbContext
+    public class WebDbContext : DbContext
     {
-        public WebDbContent(DbContextOptions<WebDbContent> options) : base(options)
+        public WebDbContext(DbContextOptions<WebDbContext> options) : base(options)
         {
         }
 

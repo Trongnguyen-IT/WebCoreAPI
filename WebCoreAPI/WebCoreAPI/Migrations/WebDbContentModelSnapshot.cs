@@ -10,7 +10,7 @@ using WebCoreAPI.Data;
 
 namespace WebCoreAPI.Migrations
 {
-    [DbContext(typeof(WebDbContent))]
+    [DbContext(typeof(WebDbContext))]
     partial class WebDbContentModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
