@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using WebCoreAPI.Data;
 using WebCoreAPI.Models;
 using WebCoreAPI.Services;
 
@@ -10,8 +11,8 @@ namespace WebCoreAPI.Controllers
     {
         private readonly ILogger<ProductController> _logger;
         private readonly IConfiguration _configuration;
-        private readonly IProductService   _productService;
-        public ProductController(ILogger<ProductController> logger, 
+        private readonly IProductService _productService;
+        public ProductController(ILogger<ProductController> logger,
             IConfiguration configuration,
             IProductService productService)
         {
@@ -28,25 +29,30 @@ namespace WebCoreAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetOne(Guid id)
+        public IActionResult GetOne(int id)
         {
-            var product = new Product
-            {
-                Id = Guid.NewGuid(),
-                Name = "product1",
-                Price = 1000
-            };
-            return Ok(product);
+            return Ok(_productService.GetOne(id));
         }
 
         [HttpPost]
-        public IActionResult Create(Product product)
+        public IActionResult Create(CreateProductModel model)
         {
-            return Ok(product);
+            var product = new Product
+            {
+                Name = model.Name,
+                Price = model.Price,
+                Promotion = model.Promotion,
+                ImageUrl = model.ImageUrl,
+                CategoryId = model.CategoryId,
+                Quantity = model.Quantity,
+                
+            };
+            _productService.Create(product);
+            return Ok();
         }
 
         [HttpPut]
-        public IActionResult Update(Product product)
+        public IActionResult Update(CreateProductModel product)
         {
             return Ok(product);
         }
