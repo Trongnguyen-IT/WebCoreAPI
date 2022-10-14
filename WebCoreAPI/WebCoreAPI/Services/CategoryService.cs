@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WebCoreAPI.Data;
+using WebCoreAPI.Models;
 using WebCoreAPI.Repositories;
 
 namespace WebCoreAPI.Services
@@ -11,9 +12,14 @@ namespace WebCoreAPI.Services
         {
             _categoryRepository = categoryRepository;
         }
-        public void Create(Category model)
+        public void Create(CategoryCreateModel model)
         {
-            _categoryRepository.Insert(model);
+            var category = new Category
+            {
+                Name = model.Name
+            };
+
+            _categoryRepository.Insert(category);
             _categoryRepository.Save();
         }
 
@@ -24,7 +30,26 @@ namespace WebCoreAPI.Services
 
         public Category GetOne(int id)
         {
-            throw new NotImplementedException();
+            return _categoryRepository.GetById(id);
+        }
+
+        public void Update(int id, CategoryCreateModel model)
+        {
+            var category = _categoryRepository.GetById(id);
+            if (category != null)
+            {
+                category.Name = model.Name;
+                category.LastModified = DateTime.Now;
+
+                _categoryRepository.Update(category);
+                _categoryRepository.Save();
+            }
+        }
+
+        public void Delete(int id)
+        {
+            _categoryRepository.Delete(id);
+            _categoryRepository.Save();
         }
     }
 }

@@ -25,11 +25,21 @@ namespace WebCoreAPI.Controllers
         [HttpPost]
         public IActionResult Create(CategoryCreateModel model)
         {
-            var category = new Category
-            {
-                Name = model.Name
-            };
-            _categoryService.Create(category);
+            _categoryService.Create(model);
+            return Ok();
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult Update(int id, CategoryCreateModel model)
+        {
+            _categoryService.Update(id, model);
+            return Ok();
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            _categoryService.Delete(id);
             return Ok();
         }
     }

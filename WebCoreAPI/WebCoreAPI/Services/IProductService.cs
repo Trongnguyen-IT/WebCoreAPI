@@ -1,4 +1,5 @@
 ﻿using WebCoreAPI.Data;
+using WebCoreAPI.Models;
 using WebCoreAPI.Services;
 
 namespace WebCoreAPI.Services
@@ -6,7 +7,9 @@ namespace WebCoreAPI.Services
     public interface IProductService
     {
         Task<IEnumerable<Product>> GetAll();
-        Product GetOne(int id);
-        void Create(Product model);
+        ProductViewmodel GetOne(int id);
+        void Create(CreateProductModel model);
+        void Update(int id, CreateProductModel product);
+        void Delete(int id);
     }
 }

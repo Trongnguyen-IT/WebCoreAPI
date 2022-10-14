@@ -37,30 +37,22 @@ namespace WebCoreAPI.Controllers
         [HttpPost]
         public IActionResult Create(CreateProductModel model)
         {
-            var product = new Product
-            {
-                Name = model.Name,
-                Price = model.Price,
-                Promotion = model.Promotion,
-                ImageUrl = model.ImageUrl,
-                CategoryId = model.CategoryId,
-                Quantity = model.Quantity,
-                
-            };
-            _productService.Create(product);
+            _productService.Create(model);
             return Ok();
         }
 
-        [HttpPut]
-        public IActionResult Update(CreateProductModel product)
+        [HttpPut("{id}")]
+        public IActionResult Update(int id, CreateProductModel model)
         {
-            return Ok(product);
+            _productService.Update(id, model);
+            return Ok();
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(Guid id)
+        public IActionResult Delete(int id)
         {
-            return Ok(id);
+            _productService.Delete(id);
+            return Ok();
         }
     }
 }

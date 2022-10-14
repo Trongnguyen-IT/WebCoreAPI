@@ -1,4 +1,5 @@
 ﻿using WebCoreAPI.Data;
+using WebCoreAPI.Models;
 
 namespace WebCoreAPI.Services
 {
@@ -6,6 +7,8 @@ namespace WebCoreAPI.Services
     {
         Task<IEnumerable<Category>> GetAll();
         Category GetOne(int id);
-        void Create(Category model);
+        void Create(CategoryCreateModel model);
+        void Update(int id, CategoryCreateModel model);
+        void Delete(int id);
     }
 }
