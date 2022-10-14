@@ -15,7 +15,6 @@ namespace WebCoreAPI.Services
         public ProductService(IProductRepository productRepository,
             IGenericDbContext<WebDbContext> genericDbContext,
             ICategoryRepository categoryRepository)
-
         {
             _genericDbContext = genericDbContext;
             _productRepository = productRepository;
