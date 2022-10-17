@@ -12,7 +12,13 @@ namespace WebCoreAPI.Data
 
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<User> Users { get; set; }
         #endregion
 
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>(e => e.HasIndex(e => e.UserName).IsUnique());
+        }
     }
 }

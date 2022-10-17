@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebCoreAPI.Data;
 
@@ -11,9 +12,10 @@ using WebCoreAPI.Data;
 namespace WebCoreAPI.Migrations
 {
     [DbContext(typeof(WebDbContext))]
-    partial class WebDbContentModelSnapshot : ModelSnapshot
+    [Migration("20221015145106_user")]
+    partial class user
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

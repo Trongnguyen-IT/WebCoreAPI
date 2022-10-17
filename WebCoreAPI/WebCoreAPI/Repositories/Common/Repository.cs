@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Linq.Expressions;
 using WebCoreAPI.Data;
 
 namespace WebCoreAPI.Repositories.Common
@@ -23,10 +25,21 @@ namespace WebCoreAPI.Repositories.Common
         {
             return table.AsQueryable();
         }
+        
+        public virtual IQueryable<T> FindBy(Expression<Func<T, bool>> predicate)
+        {
+            return table.Where(predicate);
+        }
+
 
         public T GetById(object id)
         {
             return table.Find(id);
+        }
+
+        public T GetSingle(Expression<Func<T, bool>> predicate)
+        {
+            return table.FirstOrDefault(predicate);
         }
 
         public void Insert(T obj)
