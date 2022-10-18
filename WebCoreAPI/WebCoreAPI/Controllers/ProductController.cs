@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebCoreAPI.Data;
 using WebCoreAPI.Models;
 using WebCoreAPI.Services;
@@ -22,6 +23,7 @@ namespace WebCoreAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAll()
         {
             var result = await _productService.GetAll();
