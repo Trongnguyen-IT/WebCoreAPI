@@ -3,7 +3,7 @@ using WebCoreAPI.Repositories.Common;
 
 namespace WebCoreAPI.Repositories
 {
-    public interface IUserRepository : IRepository<ApplicationUser >
+    public interface IUserRepository : IRepository<AppUser >
     {
     }
 }

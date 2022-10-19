@@ -1,11 +1,14 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebCoreAPI.Data
 {
-    public class ApplicationUserRole : IdentityUserRole<int>
+    public class AppUserRole : IdentityUserRole<int>
     {
-        public virtual ApplicationRole  Role { get; set; }
+        [ForeignKey(nameof(RoleId))]
+        public virtual AppRole  Role { get; set; }
 
-        public virtual ApplicationUser  User { get; set; }
+        [ForeignKey(nameof(UserId))]
+        public virtual AppUser  User { get; set; }
     }
 }

@@ -30,7 +30,7 @@ builder.Services.AddDbContext<WebDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-builder.Services.AddIdentity<ApplicationUser , ApplicationRole >()
+builder.Services.AddIdentity<AppUser , AppRole >()
             .AddEntityFrameworkStores<WebDbContext>()
             .AddDefaultTokenProviders();
 

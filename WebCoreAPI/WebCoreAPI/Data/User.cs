@@ -2,7 +2,7 @@
 
 namespace WebCoreAPI.Data
 {
-    public class ApplicationUser  : IdentityUser<int>
+    public class AppUser  : IdentityUser<int>
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -14,6 +14,6 @@ namespace WebCoreAPI.Data
         public virtual ICollection<IdentityUserClaim<int>> Claims { get; set; }
         public virtual ICollection<IdentityUserLogin<int>> Logins { get; set; }
         public virtual ICollection<IdentityUserToken<int>> Tokens { get; set; }
-        public virtual ICollection<ApplicationUserRole > UserRoles { get; set; }
+        public virtual ICollection<AppUserRole > UserRoles { get; set; }
     }
 }
