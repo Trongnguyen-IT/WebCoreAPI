@@ -11,9 +11,9 @@ namespace WebCoreAPI.Data
         public DateTime? LastModified { get; set; }
         public bool IsActive { get; set; }
 
-        public virtual ICollection<IdentityUserClaim<string>> Claims { get; set; }
-        public virtual ICollection<IdentityUserLogin<string>> Logins { get; set; }
-        public virtual ICollection<IdentityUserToken<string>> Tokens { get; set; }
+        public virtual ICollection<IdentityUserClaim<int>> Claims { get; set; }
+        public virtual ICollection<IdentityUserLogin<int>> Logins { get; set; }
+        public virtual ICollection<IdentityUserToken<int>> Tokens { get; set; }
         public virtual ICollection<ApplicationUserRole > UserRoles { get; set; }
     }
 }
