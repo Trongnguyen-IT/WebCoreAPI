@@ -1,16 +1,17 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Linq.Expressions;
-using WebCoreAPI.Data;
+using WebCoreAPI.DbContext;
+using WebCoreAPI.Entity;
 
 namespace WebCoreAPI.Repositories.Common
 {
     public class Repository<T> : IRepository<T> where T : class, IKeyEntity<int>
     {
-        private WebDbContext _dbContext;
+        private AppDbContext _dbContext;
         private DbSet<T> table;
 
-        public Repository(WebDbContext dbContext)
+        public Repository(AppDbContext dbContext)
         {
             _dbContext = dbContext;
             table = _dbContext.Set<T>();

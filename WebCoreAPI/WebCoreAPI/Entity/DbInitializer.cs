@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Linq;
+using WebCoreAPI.DbContext;
 
-namespace WebCoreAPI.Data
+namespace WebCoreAPI.Entity
 {
     public static class DbInitializer
     {
-        public static void Initialize(WebDbContext context)
+        public static void Initialize(AppDbContext context)
         {
             context.Database.EnsureCreated();
 

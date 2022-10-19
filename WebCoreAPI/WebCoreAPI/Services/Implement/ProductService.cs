@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using WebCoreAPI.Data;
-using WebCoreAPI.GenericDbContext;
+using WebCoreAPI.DbContext;
+using WebCoreAPI.Entity;
 using WebCoreAPI.Models;
 using WebCoreAPI.Repositories;
 
@@ -10,10 +10,10 @@ namespace WebCoreAPI.Services
     {
         private readonly IProductRepository _productRepository;
         private readonly ICategoryRepository _categoryRepository;
-        private readonly IGenericDbContext<WebDbContext> _genericDbContext;
+        private readonly IGenericDbContext<AppDbContext> _genericDbContext;
 
         public ProductService(IProductRepository productRepository,
-            IGenericDbContext<WebDbContext> genericDbContext,
+            IGenericDbContext<AppDbContext> genericDbContext,
             ICategoryRepository categoryRepository)
         {
             _genericDbContext = genericDbContext;

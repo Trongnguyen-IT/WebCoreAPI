@@ -3,7 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using WebCoreAPI.Data;
+using WebCoreAPI.Entity;
 using WebCoreAPI.Migrations;
 using WebCoreAPI.Models;
 using WebCoreAPI.Repositories;

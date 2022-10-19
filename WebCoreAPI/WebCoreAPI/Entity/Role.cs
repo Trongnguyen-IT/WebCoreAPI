@@ -1,7 +1,7 @@
 ﻿
 using Microsoft.AspNetCore.Identity;
 
-namespace WebCoreAPI.Data
+namespace WebCoreAPI.Entity
 {
     public class AppRole : IdentityRole<int>
     {

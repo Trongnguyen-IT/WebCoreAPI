@@ -5,13 +5,13 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using WebCoreAPI.Data;
+using WebCoreAPI.DbContext;
 
 #nullable disable
 
 namespace WebCoreAPI.Migrations
 {
-    [DbContext(typeof(WebDbContext))]
+    [DbContext(typeof(AppDbContext))]
     [Migration("20221013175020_update_baseentity")]
     partial class update_baseentity
     {

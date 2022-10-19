@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using WebCoreAPI.Data;
+using WebCoreAPI.DbContext;
 
 #nullable disable
 
 namespace WebCoreAPI.Migrations
 {
-    [DbContext(typeof(WebDbContext))]
+    [DbContext(typeof(AppDbContext))]
     partial class WebDbContentModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
@@ -110,7 +110,7 @@ namespace WebCoreAPI.Migrations
                     b.ToTable("AppUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("WebCoreAPI.Data.AppRole", b =>
+            modelBuilder.Entity("WebCoreAPI.Entity.AppRole", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -152,7 +152,7 @@ namespace WebCoreAPI.Migrations
                     b.ToTable("AppRoles", (string)null);
                 });
 
-            modelBuilder.Entity("WebCoreAPI.Data.AppUser", b =>
+            modelBuilder.Entity("WebCoreAPI.Entity.AppUser", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -180,19 +180,18 @@ namespace WebCoreAPI.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<string>("FirstName")
+                    b.Property<string>("FullName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsFirstTimeLogin")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -208,6 +207,10 @@ namespace WebCoreAPI.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
 
@@ -222,6 +225,9 @@ namespace WebCoreAPI.Migrations
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
+
+                    b.Property<int>("UseType")
+                        .HasColumnType("int");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
@@ -240,7 +246,7 @@ namespace WebCoreAPI.Migrations
                     b.ToTable("AppUser", (string)null);
                 });
 
-            modelBuilder.Entity("WebCoreAPI.Data.AppUserRole", b =>
+            modelBuilder.Entity("WebCoreAPI.Entity.AppUserRole", b =>
                 {
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -255,7 +261,7 @@ namespace WebCoreAPI.Migrations
                     b.ToTable("AppUserRoles", (string)null);
                 });
 
-            modelBuilder.Entity("WebCoreAPI.Data.Category", b =>
+            modelBuilder.Entity("WebCoreAPI.Entity.Category", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -284,7 +290,7 @@ namespace WebCoreAPI.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("WebCoreAPI.Data.Product", b =>
+            modelBuilder.Entity("WebCoreAPI.Entity.Product", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -331,7 +337,7 @@ namespace WebCoreAPI.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
-                    b.HasOne("WebCoreAPI.Data.AppRole", null)
+                    b.HasOne("WebCoreAPI.Entity.AppRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -340,7 +346,7 @@ namespace WebCoreAPI.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
                 {
-                    b.HasOne("WebCoreAPI.Data.AppUser", null)
+                    b.HasOne("WebCoreAPI.Entity.AppUser", null)
                         .WithMany("Claims")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -349,7 +355,7 @@ namespace WebCoreAPI.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
                 {
-                    b.HasOne("WebCoreAPI.Data.AppUser", null)
+                    b.HasOne("WebCoreAPI.Entity.AppUser", null)
                         .WithMany("Logins")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -358,22 +364,22 @@ namespace WebCoreAPI.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
                 {
-                    b.HasOne("WebCoreAPI.Data.AppUser", null)
+                    b.HasOne("WebCoreAPI.Entity.AppUser", null)
                         .WithMany("Tokens")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("WebCoreAPI.Data.AppUserRole", b =>
+            modelBuilder.Entity("WebCoreAPI.Entity.AppUserRole", b =>
                 {
-                    b.HasOne("WebCoreAPI.Data.AppRole", "Role")
+                    b.HasOne("WebCoreAPI.Entity.AppRole", "Role")
                         .WithMany("UserRoles")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("WebCoreAPI.Data.AppUser", "User")
+                    b.HasOne("WebCoreAPI.Entity.AppUser", "User")
                         .WithMany("UserRoles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -384,21 +390,21 @@ namespace WebCoreAPI.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("WebCoreAPI.Data.Product", b =>
+            modelBuilder.Entity("WebCoreAPI.Entity.Product", b =>
                 {
-                    b.HasOne("WebCoreAPI.Data.Category", "Category")
+                    b.HasOne("WebCoreAPI.Entity.Category", "Category")
                         .WithMany("Products")
                         .HasForeignKey("CategoryId");
 
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("WebCoreAPI.Data.AppRole", b =>
+            modelBuilder.Entity("WebCoreAPI.Entity.AppRole", b =>
                 {
                     b.Navigation("UserRoles");
                 });
 
-            modelBuilder.Entity("WebCoreAPI.Data.AppUser", b =>
+            modelBuilder.Entity("WebCoreAPI.Entity.AppUser", b =>
                 {
                     b.Navigation("Claims");
 
@@ -409,7 +415,7 @@ namespace WebCoreAPI.Migrations
                     b.Navigation("UserRoles");
                 });
 
-            modelBuilder.Entity("WebCoreAPI.Data.Category", b =>
+            modelBuilder.Entity("WebCoreAPI.Entity.Category", b =>
                 {
                     b.Navigation("Products");
                 });

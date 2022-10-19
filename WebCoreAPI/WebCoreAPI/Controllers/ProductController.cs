@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WebCoreAPI.Data;
 using WebCoreAPI.Models;
 using WebCoreAPI.Services;
 

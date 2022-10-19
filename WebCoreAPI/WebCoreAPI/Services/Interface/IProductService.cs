@@ -1,4 +1,4 @@
-﻿using WebCoreAPI.Data;
+﻿using WebCoreAPI.Entity;
 using WebCoreAPI.Models;
 using WebCoreAPI.Services;
 

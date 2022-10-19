@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace WebCoreAPI.Data
+namespace WebCoreAPI.Entity
 {
     public class Product : BaseEntity
     {

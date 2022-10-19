@@ -1,4 +1,4 @@
-﻿namespace WebCoreAPI.Data
+﻿namespace WebCoreAPI.Entity
 {
     public interface IKeyEntity<T> where T : struct
     {

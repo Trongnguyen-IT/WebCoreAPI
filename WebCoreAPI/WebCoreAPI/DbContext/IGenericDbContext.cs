@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace WebCoreAPI.GenericDbContext
+namespace WebCoreAPI.DbContext
 {
     public interface IGenericDbContext<T> where T : Microsoft.EntityFrameworkCore.DbContext, IDisposable
     {

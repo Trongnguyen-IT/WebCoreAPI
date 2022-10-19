@@ -1,4 +1,4 @@
-﻿using WebCoreAPI.Data;
+﻿using WebCoreAPI.Entity;
 using WebCoreAPI.Models;
 
 namespace WebCoreAPI.Services

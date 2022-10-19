@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
-namespace WebCoreAPI.GenericDbContext
+namespace WebCoreAPI.DbContext
 {
-    public class GenericDbContext<T> : IGenericDbContext<T> where T: Microsoft.EntityFrameworkCore.DbContext , IDisposable
+    public class GenericDbContext<T> : IGenericDbContext<T> where T : Microsoft.EntityFrameworkCore.DbContext, IDisposable
     {
         // Flag: Has Dispose already been called? recheck solution???
         private bool disposed = false;
