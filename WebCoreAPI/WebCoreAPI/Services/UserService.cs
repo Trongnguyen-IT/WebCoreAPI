@@ -24,7 +24,7 @@ namespace WebCoreAPI.Services
 
         public ApiResponse<object> Login(LoginModel model)
         {
-            var user = _userRepository.GetSingle(p => p.UserName == model.UserName && p.Password == model.Password);
+            var user = new ApplicationUser();// _userRepository.GetSingle(p => p.UserName == model.UserName && p.Password == model.Password);
             if (user == null)
             {
                 return new ApiResponse<object>()
@@ -45,7 +45,7 @@ namespace WebCoreAPI.Services
             };
         }
 
-        private string GenerateToken(User user)
+        private string GenerateToken(ApplicationUser  user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var secretKeyBytes = Encoding.UTF8.GetBytes(_appSettings.SecretKey);
