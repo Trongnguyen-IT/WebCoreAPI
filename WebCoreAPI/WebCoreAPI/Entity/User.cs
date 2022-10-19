@@ -6,7 +6,6 @@ namespace WebCoreAPI.Entity
     public class AppUser : IdentityUser<int>
     {
         public string FullName { get; set; }
-        public string Password { get; set; }
         public int CreatedBy { get; set; }
         public DateTime DateCreated { get; set; } = DateTime.Now;
         public DateTime? LastModified { get; set; }

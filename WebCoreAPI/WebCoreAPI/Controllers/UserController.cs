@@ -14,12 +14,15 @@ namespace WebCoreAPI.Controllers
     {
         //private readonly IUserService _userService;
         private readonly UserManager<AppUser> _userManager;
+        public readonly IPasswordHasher<AppUser> _passwordHasher;
         public UserController(
             //IUserService userService,
-            UserManager<AppUser> userManager)
+            UserManager<AppUser> userManager,
+            IPasswordHasher<AppUser> passwordHasher)
         {
             //_userService = userService;
             _userManager = userManager;
+            _passwordHasher = passwordHasher;
         }
 
         //[HttpPost]
@@ -40,7 +43,7 @@ namespace WebCoreAPI.Controllers
                 IsFirstTimeLogin = true,
                 UseType = UserType.SuperAdmin,
                 //EmployeeCode = input.UserName,
-                Password = input.Password
+                //Password = input.Password
             };
 
             var result = await _userManager.CreateAsync(user, input.Password);
