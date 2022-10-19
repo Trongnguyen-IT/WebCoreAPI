@@ -12,13 +12,14 @@ namespace WebCoreAPI.Services
 {
     public class UserService : IUserService
     {
-        private readonly IUserRepository _userRepository;
+        //private readonly IUserRepository _userRepository;
         private readonly AppSettings _appSettings;
 
-        public UserService(IUserRepository userRepository,
+        public UserService(
+            //IUserRepository userRepository,
             IOptionsMonitor<AppSettings> optionsMonitor)
         {
-            _userRepository = userRepository;
+            //_userRepository = userRepository;
             _appSettings = optionsMonitor.CurrentValue;
         }
 
