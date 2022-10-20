@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using WebCoreAPI.DbContext;
 using WebCoreAPI.Entity;
+using WebCoreAPI.Enum;
 
 namespace WebCoreAPI.Data
 {
@@ -10,26 +12,53 @@ namespace WebCoreAPI.Data
         {
             using (var context = new AppDbContext(serviceProvider.GetRequiredService<DbContextOptions<AppDbContext>>()))
             {
-                SeedDB(context, testUserPw);
+                //var context = serviceProvider.GetService<AppDbContext>();
+                var _roleManager = serviceProvider.GetService<RoleManager<AppRole>>();
+                var _userManager = serviceProvider.GetService<UserManager<AppUser>>();
+
+                SeedRoles(_roleManager);
+                SeedUsers(_userManager, testUserPw);
             }
         }
 
-        public static void SeedDB(AppDbContext context, string adminID)
+        public static void SeedRoles(RoleManager<AppRole> roleManager)
         {
-            if (context.Users.Any())
-            {
-                return;   // DB has been seeded
-            }
+            string[] roles = new string[] { "Owner", "Administrator", "Manager", "Editor", "Buyer", "Business", "Seller", "Subscriber" };
 
-            context.Users.AddRange(
-                new AppUser
+            foreach (string role in roles)
+            {
+                //var roleStore = new RoleStore<IdentityRole>(context);
+                var existRole = roleManager.FindByNameAsync(role);
+                if (existRole == null)
                 {
-                    FullName= "Admin",
-                    IsActive= true,
-                    Email="admin@gmail.com",
-                    UserName="admin",
-                });
-            context.SaveChanges();
+                    roleManager.CreateAsync(new AppRole
+                    {
+                        Name = role
+                    }).Wait();
+                }
+            }
+        }
+
+        public static void SeedUsers(UserManager<AppUser> userManager, string testUserPw = "")
+        {
+            if (userManager.FindByEmailAsync("admin@gmail.com").Result == null)
+            {
+                var user = new AppUser
+                {
+                    UserName = "admin",
+                    Email = "admin@gmail.com",
+                    FullName = "admin",
+                    IsActive = true,
+                    UseType = UserType.SuperAdmin
+                };
+
+                IdentityResult result = userManager.CreateAsync(user, testUserPw).Result;
+
+                if (result.Succeeded)
+                {
+                    userManager.AddToRoleAsync(user, "Administrator").Wait();
+                }
+            }
         }
     }
 }
