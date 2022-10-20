@@ -36,8 +36,9 @@ namespace WebCoreAPI.Controllers
             _dbContext = dbContext;
         }
 
-        [HttpPost("Login")]
-        public async Task<IActionResult> Login(UserLoginDto input)
+        [HttpPost]
+        [Route("Login")]
+        public async Task<IActionResult> Login([FromBody]UserLoginDto input)
         {
             var user = await _userManager.FindByNameAsync(input.UserName);
             if (user is null)
@@ -94,6 +95,7 @@ namespace WebCoreAPI.Controllers
         }
 
         [HttpPost]
+        [Route("Create")]
         public async Task<IActionResult> CreateUser(UserCreateOrUpdateDto input)
         {
             var user = new AppUser
