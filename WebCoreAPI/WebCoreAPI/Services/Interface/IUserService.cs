@@ -1,9 +1,9 @@
-﻿using WebCoreAPI.Models;
+﻿//using WebCoreAPI.Models;
 
-namespace WebCoreAPI.Services
-{
-    public interface IUserService
-    {
-        public ApiResponse<object> Login(UserLoginDto model);
-    }
-}
+//namespace WebCoreAPI.Services
+//{
+//    public interface IUserService
+//    {
+//        Task<ApiResponse<object>> Login(UserLoginDto model);
+//    }
+//}

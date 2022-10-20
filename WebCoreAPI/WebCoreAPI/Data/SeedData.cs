@@ -10,35 +10,45 @@ namespace WebCoreAPI.Data
     {
         public static async Task Initialize(IServiceProvider serviceProvider, string testUserPw = "")
         {
-            using (var context = new AppDbContext(serviceProvider.GetRequiredService<DbContextOptions<AppDbContext>>()))
-            {
+            //using (var context = new AppDbContext(serviceProvider.GetRequiredService<DbContextOptions<AppDbContext>>()))
+            //{
                 //var context = serviceProvider.GetService<AppDbContext>();
-                var _roleManager = serviceProvider.GetService<RoleManager<AppRole>>();
-                var _userManager = serviceProvider.GetService<UserManager<AppUser>>();
+                //var _roleManager = serviceProvider.GetService<RoleManager<AppRole>>();
+                //var _userManager = serviceProvider.GetService<UserManager<AppUser>>();
 
-                SeedRoles(_roleManager);
-                SeedUsers(_userManager, testUserPw);
+                //await SeedRoles(_roleManager);
+                //await SeedUsers(_userManager, testUserPw);
+            //}
+
+            using (var _roleManager = serviceProvider.GetService<RoleManager<AppRole>>())
+            {
+                await SeedRoles(_roleManager);
+            }
+
+            using (var _userManager = serviceProvider.GetService<UserManager<AppUser>>())
+            {
+                await SeedUsers(_userManager, testUserPw);
             }
         }
 
-        public static void SeedRoles(RoleManager<AppRole> roleManager)
+        public async static Task SeedRoles(RoleManager<AppRole> roleManager)
         {
             string[] roles = new string[] { "Owner", "Administrator", "Manager", "Editor", "Buyer", "Business", "Seller", "Subscriber" };
 
             foreach (string role in roles)
             {
-                var existRole = roleManager.FindByNameAsync(role).Result;
+                var existRole =await roleManager.FindByNameAsync(role);
                 if (existRole == null)
                 {
-                    roleManager.CreateAsync(new AppRole
+                    await roleManager.CreateAsync(new AppRole
                     {
                         Name = role
-                    }).Wait();
+                    });
                 }
             }
         }
 
-        public static void SeedUsers(UserManager<AppUser> userManager, string testUserPw = "")
+        public async static Task  SeedUsers(UserManager<AppUser> userManager, string testUserPw = "")
         {
             if (userManager.FindByEmailAsync("admin@gmail.com").Result == null)
             {
@@ -51,11 +61,11 @@ namespace WebCoreAPI.Data
                     UseType = UserType.SuperAdmin
                 };
 
-                IdentityResult result = userManager.CreateAsync(user, testUserPw).Result;
+                IdentityResult result =await userManager.CreateAsync(user, testUserPw);
 
                 if (result.Succeeded)
                 {
-                    userManager.AddToRoleAsync(user, "Administrator").Wait();
+                   await userManager.AddToRoleAsync(user, "Administrator");
                 }
             }
         }

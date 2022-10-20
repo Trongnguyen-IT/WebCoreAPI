@@ -1,10 +1,15 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using WebCoreAPI.DbContext;
 using WebCoreAPI.Entity;
 using WebCoreAPI.Enum;
-using WebCoreAPI.Migrations;
 using WebCoreAPI.Models;
-using WebCoreAPI.Services;
 
 namespace WebCoreAPI.Controllers
 {
@@ -12,20 +17,26 @@ namespace WebCoreAPI.Controllers
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
-        private readonly IUserService _userService;
+        private readonly AppSettings _appSettings;
+        //private readonly IUserService _userService;
         private readonly UserManager<AppUser> _userManager;
         public readonly IPasswordHasher<AppUser> _passwordHasher;
+        public readonly IGenericDbContext<AppDbContext> _dbContext;
 
-        public UserController(IUserService userService,
+        public UserController(IOptionsMonitor<AppSettings> optionsMonitor,
+            //IUserService userService,
             UserManager<AppUser> userManager,
-            IPasswordHasher<AppUser> passwordHasher)
+            IPasswordHasher<AppUser> passwordHasher,
+            IGenericDbContext<AppDbContext> dbContext)
         {
-            _userService = userService;
+            _appSettings = optionsMonitor.CurrentValue;
+            //_userService = userService;
             _userManager = userManager;
             _passwordHasher = passwordHasher;
+            _dbContext = dbContext;
         }
 
-        [HttpPost]
+        [HttpPost("Login")]
         public async Task<IActionResult> Login(UserLoginDto input)
         {
             var user = await _userManager.FindByNameAsync(input.UserName);
@@ -36,59 +47,48 @@ namespace WebCoreAPI.Controllers
                 return Unauthorized();
             if (await _userManager.CheckPasswordAsync(user, input.Password))
             {
-                //var query = from s in db.UserRoles.AsNoTracking()
-                //            join sa in db.RoleClaims.AsNoTracking() on s.RoleId equals sa.RoleId
-                //            where s.UserId == user.Id && sa.ClaimType == "Permission" //Permissions.Type
-                //            select sa.ClaimValue;
+                var permissions = (from s in _dbContext.Repository<AppUserRole>().AsNoTracking()
+                                   join sa in _dbContext.Repository<IdentityRoleClaim<int>>().AsNoTracking() on s.RoleId equals sa.RoleId
+                                   where s.UserId == user.Id && sa.ClaimType == "Permission" //Permissions.Type
+                                   select sa.ClaimValue)
+                            .ToList();
 
-                //var permissions = query.ToList();
+                var roleName = (from s in _dbContext.Repository<AppUserRole>()
+                                join sa in _dbContext.Repository<AppRole>() on s.RoleId equals sa.Id
+                                where s.UserId == user.Id
+                                select sa.Name).FirstOrDefault();
 
-                //query = from s in db.UserRoles
-                //        join sa in db.Roles on s.RoleId equals sa.Id
-                //        where s.UserId == user.Id
-                //        select sa.Name;
+                var issuer = _appSettings.Issuer;
+                var audience = _appSettings.Audience;
+                var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.SecretKey));
+                var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+                var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                        new Claim(ClaimTypes.Email, user.Email??user.UserName),
+                        new Claim(ClaimTypes.Name, user.FullName),
+                        new Claim(ClaimTypes.Role, roleName),
+                    };
 
-                //var roleName = query.FirstOrDefault();
+                var token = new JwtSecurityToken(
+                    issuer: issuer,
+                    audience: audience,
+                    signingCredentials: credentials,
+                    claims: claims,
+                    expires: DateTime.UtcNow.AddHours(24));
 
-                //var issuer = config["Jwt:Issuer"];
-                //var audience = config["Jwt:Audience"];
-                //var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]));
-                //var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-                //var claims = new List<Claim>
-                //    {
-                //        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                //        new Claim(ClaimTypes.Email, user.Email??user.UserName),
-                //        new Claim(ClaimTypes.Name, user.Name),
-                //        new Claim(ClaimTypes.Role, roleName),
-                //    };
-
-                //var token = new JwtSecurityToken(
-                //    issuer: issuer,
-                //    audience: audience,
-                //    signingCredentials: credentials,
-                //    claims: claims,
-                //    expires: DateTime.UtcNow.AddHours(24));
-
-                //var tokenHandler = new JwtSecurityTokenHandler();
-                //var accessToken = tokenHandler.WriteToken(token);
-                //return Results.Ok(new
-                //{
-                //    accessToken,
-                //    user.Email,
-                //    user.Name,
-                //    roleName,
-                //    permissions,
-                //    user.IsFirstTimeLogin
-                //});
-                var result =await _userService.Login(input);
-                return Ok(new ApiResponse<object>
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var accessToken = tokenHandler.WriteToken(token);
+                return Ok(new
                 {
-                    Status = true,
-                    Message = "LoginSuccess",
-                    Data = null
+                    accessToken,
+                    user.Email,
+                    user.FullName,
+                    roleName,
+                    permissions,
+                    user.IsFirstTimeLogin
                 });
             }
-
 
             return Ok(user);
         }
