@@ -4,6 +4,6 @@ namespace WebCoreAPI.Services
 {
     public interface IUserService
     {
-        public ApiResponse<object> Login(LoginModel model);
+        public ApiResponse<object> Login(UserLoginDto model);
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -14,16 +15,19 @@ namespace WebCoreAPI.Services
     {
         //private readonly IUserRepository _userRepository;
         private readonly AppSettings _appSettings;
+        private readonly UserStore<AppUser>  _userStore;
 
         public UserService(
             //IUserRepository userRepository,
+            UserStore<AppUser>  userStore
             IOptionsMonitor<AppSettings> optionsMonitor)
         {
             //_userRepository = userRepository;
+            _userStore = _userStore;
             _appSettings = optionsMonitor.CurrentValue;
         }
 
-        public ApiResponse<object> Login(LoginModel model)
+        public ApiResponse<object> Login(UserLoginDto model)
         {
             var user = new AppUser();// _userRepository.GetSingle(p => p.UserName == model.UserName && p.Password == model.Password);
             if (user == null)
