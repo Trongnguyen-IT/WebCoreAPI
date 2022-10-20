@@ -27,8 +27,7 @@ namespace WebCoreAPI.Data
 
             foreach (string role in roles)
             {
-                //var roleStore = new RoleStore<IdentityRole>(context);
-                var existRole = roleManager.FindByNameAsync(role);
+                var existRole = roleManager.FindByNameAsync(role).Result;
                 if (existRole == null)
                 {
                     roleManager.CreateAsync(new AppRole
