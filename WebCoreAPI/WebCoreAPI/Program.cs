@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -68,6 +69,7 @@ builder.Services.AddIdentity<AppUser , AppRole >()
 builder.Services.AddScoped<IServiceProvider, ServiceProvider>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
 //builder.Services.AddScoped<IUserService, UserService>();
 //builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
@@ -103,29 +105,33 @@ builder.Services
         };
     });
 
-
 var app = builder.Build();
+
+// response ExceptionHandler
+app.UseExceptionHandler(c => c.Run(async context =>
+{
+    var exception = context.Features.Get<IExceptionHandlerFeature>()?.Error;
+    if (exception is not null)
+    {
+        var response = new { error = exception.Message };
+        //context.Response.StatusCode = (int)System.Net.HttpStatusCode.InternalServerError;
+        await context.Response.WriteAsJsonAsync(response);
+    }
+}));
 
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<AppDbContext>();
+    context.Database.Migrate();
+    // requires using Microsoft.Extensions.Configuration;
+    // Set password with the Secret Manager tool.
+    // dotnet user-secrets set SeedUserPW <pw>
+
     var testUserPw = "Admin@1234";// builder.Configuration.GetValue<string>("SeedUserPW");
+
     await SeedData.Initialize(services, testUserPw);
 }
-
-//using (var scope = app.Services.CreateScope())
-//{
-//    var services = scope.ServiceProvider;
-//    var context = services.GetRequiredService<AppDbContext>();
-//    context.Database.Migrate();
-//    // requires using Microsoft.Extensions.Configuration;
-//    // Set password with the Secret Manager tool.
-//    // dotnet user-secrets set SeedUserPW <pw>
-
-//    var testUserPw = "Admin@1234";// builder.Configuration.GetValue<string>("SeedUserPW");
-
-//    await SeedData.Initialize(services, testUserPw);
-//}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
