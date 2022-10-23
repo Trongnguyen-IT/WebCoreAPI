@@ -12,12 +12,12 @@ namespace WebCoreAPI.Data
         {
             //using (var context = new AppDbContext(serviceProvider.GetRequiredService<DbContextOptions<AppDbContext>>()))
             //{
-                //var context = serviceProvider.GetService<AppDbContext>();
-                //var _roleManager = serviceProvider.GetService<RoleManager<AppRole>>();
-                //var _userManager = serviceProvider.GetService<UserManager<AppUser>>();
+            //var context = serviceProvider.GetService<AppDbContext>();
+            //var _roleManager = serviceProvider.GetService<RoleManager<AppRole>>();
+            //var _userManager = serviceProvider.GetService<UserManager<AppUser>>();
 
-                //await SeedRoles(_roleManager);
-                //await SeedUsers(_userManager, testUserPw);
+            //await SeedRoles(_roleManager);
+            //await SeedUsers(_userManager, testUserPw);
             //}
 
             using (var _roleManager = serviceProvider.GetService<RoleManager<AppRole>>())
@@ -37,8 +37,7 @@ namespace WebCoreAPI.Data
 
             foreach (string role in roles)
             {
-                var existRole =await roleManager.FindByNameAsync(role);
-                if (existRole == null)
+                if (!await roleManager.RoleExistsAsync(role))
                 {
                     await roleManager.CreateAsync(new AppRole
                     {
@@ -48,7 +47,7 @@ namespace WebCoreAPI.Data
             }
         }
 
-        public async static Task  SeedUsers(UserManager<AppUser> userManager, string testUserPw = "")
+        public async static Task SeedUsers(UserManager<AppUser> userManager, string testUserPw = "")
         {
             if (userManager.FindByEmailAsync("admin@gmail.com").Result == null)
             {
@@ -61,11 +60,11 @@ namespace WebCoreAPI.Data
                     UseType = UserType.SuperAdmin
                 };
 
-                IdentityResult result =await userManager.CreateAsync(user, testUserPw);
+                IdentityResult result = await userManager.CreateAsync(user, testUserPw);
 
                 if (result.Succeeded)
                 {
-                   await userManager.AddToRoleAsync(user, "Administrator");
+                    await userManager.AddToRoleAsync(user, "Administrator");
                 }
             }
         }

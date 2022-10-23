@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -10,6 +11,7 @@ using WebCoreAPI.DbContext;
 using WebCoreAPI.Entity;
 using WebCoreAPI.Enum;
 using WebCoreAPI.Models;
+using WebCoreAPI.Models.Auth;
 
 namespace WebCoreAPI.Controllers
 {
@@ -36,9 +38,16 @@ namespace WebCoreAPI.Controllers
             _dbContext = dbContext;
         }
 
+        [HttpGet]
+        [Authorize(Policy = "ReadUser")]
+        public async Task<IActionResult> GetAll()
+        {
+            return Ok(await _userManager.Users.ToListAsync());
+        }
+
         [HttpPost]
         [Route("Login")]
-        public async Task<IActionResult> Login([FromBody]UserLoginDto input)
+        public async Task<IActionResult> Login([FromBody] UserLoginDto input)
         {
             var user = await _userManager.FindByNameAsync(input.UserName);
             if (user is null)
@@ -65,7 +74,8 @@ namespace WebCoreAPI.Controllers
                 var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
                 var claims = new List<Claim>
                     {
-                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                        new Claim(DefineClaimTypes.UserId, user.Id.ToString()),
+                        new Claim(ClaimTypes.NameIdentifier, user.UserName),
                         new Claim(ClaimTypes.Email, user.Email??user.UserName),
                         new Claim(ClaimTypes.Name, user.FullName),
                         new Claim(ClaimTypes.Role, roleName),

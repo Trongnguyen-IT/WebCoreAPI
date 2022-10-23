@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,8 @@ using WebCoreAPI.Data;
 using WebCoreAPI.DbContext;
 using WebCoreAPI.Entity;
 using WebCoreAPI.Models;
+using WebCoreAPI.Models.Auth;
+using WebCoreAPI.Permission;
 using WebCoreAPI.Repositories;
 using WebCoreAPI.Repositories.Common;
 using WebCoreAPI.Services;
@@ -76,7 +79,8 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped(typeof(IGenericDbContext<>), typeof(GenericDbContext<>));
-
+builder.Services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
+builder.Services.AddTransient<IHttpContextCurrentUser, HttpContextCurrentUser>();
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 var secretKey = builder.Configuration["AppSettings:SecretKey"];
 var secretKeyBytes = Encoding.UTF8.GetBytes(secretKey);
@@ -104,6 +108,13 @@ builder.Services
             ClockSkew = TimeSpan.Zero
         };
     });
+
+//add claims- permissions
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("ReadUser", policy =>
+        policy.Requirements.Add(new PermissionAuthorizationRequirement("ReadUser")));
+});
 
 var app = builder.Build();
 
