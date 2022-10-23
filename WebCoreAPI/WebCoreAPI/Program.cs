@@ -9,6 +9,7 @@ using System.Text;
 using WebCoreAPI.Data;
 using WebCoreAPI.DbContext;
 using WebCoreAPI.Entity;
+using WebCoreAPI.Extensions;
 using WebCoreAPI.Models;
 using WebCoreAPI.Models.Auth;
 using WebCoreAPI.Permission;
@@ -65,7 +66,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-builder.Services.AddIdentity<AppUser , AppRole >()
+builder.Services.AddIdentity<AppUser, AppRole>()
             .AddEntityFrameworkStores<AppDbContext>()
             .AddDefaultTokenProviders();
 
@@ -110,11 +111,7 @@ builder.Services
     });
 
 //add claims- permissions
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("ReadUser", policy =>
-        policy.Requirements.Add(new PermissionAuthorizationRequirement("ReadUser")));
-});
+builder.Services.AddAuthorization(options => options.AddAuthorizationPolicy());
 
 var app = builder.Build();
 
