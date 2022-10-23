@@ -19,6 +19,11 @@ namespace WebCoreAPI.Permission
             using (var scope = scopeFactory.CreateScope())
             {
                 var userId = context.User.FindFirstValue(DefineClaimTypes.UserId);
+                var isAuthenticated = context.User.Identity.IsAuthenticated;
+                if (!isAuthenticated)
+                {
+                    return Task.CompletedTask;
+                }
                 var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
                 var user = db.Users.FirstOrDefault(p => p.Id == Convert.ToInt32(userId));
                 if (user != null && user.UserName == "admin")
