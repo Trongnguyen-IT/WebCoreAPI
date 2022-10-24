@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
+using System.Security;
 using WebCoreAPI.Entity;
 using WebCoreAPI.Models.Auth;
+using WebCoreAPI.Models.Permission;
 
 namespace WebCoreAPI.Services
 {
@@ -17,6 +20,19 @@ namespace WebCoreAPI.Services
             _userManager = userManager;
             _roleManager = roleManager;
             _httpContextCurrentUser = httpContextCurrentUser;
+        }
+
+        public async Task AddPermission(PermissionCreateOrUpdateDto input)
+        {
+           var role = await _roleManager.FindByIdAsync(input.RoleId.ToString());
+            var claimsInRole =await _roleManager.GetClaimsAsync(role);
+            foreach (var item in input.Permissions)
+            {
+                if (!claimsInRole.Any(a => a.Type.Equals(Permissions.Type, StringComparison.OrdinalIgnoreCase) && a.Value.Equals(item, StringComparison.OrdinalIgnoreCase)))
+                {
+                    await _roleManager.AddClaimAsync(role, new Claim(Permissions.Type, item));
+                }
+            }
         }
 
         public async Task<IdentityResult> Assign(int userId, int roleId)

@@ -12,6 +12,7 @@ using WebCoreAPI.Entity;
 using WebCoreAPI.Enum;
 using WebCoreAPI.Models;
 using WebCoreAPI.Models.Auth;
+using WebCoreAPI.Models.Permission;
 
 namespace WebCoreAPI.Controllers
 {
@@ -39,7 +40,8 @@ namespace WebCoreAPI.Controllers
         }
 
         [HttpGet]
-        [Authorize(Policy = "ReadUser")]
+        [Authorize(Policy = "User")]
+        [Authorize(Policy = "Role")]
         public async Task<IActionResult> GetAll()
         {
             return Ok(await _userManager.Users.ToListAsync());
@@ -72,13 +74,13 @@ namespace WebCoreAPI.Controllers
                 var audience = _appSettings.Audience;
                 var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.SecretKey));
                 var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-                var claims = new List<Claim>
+                var claims = new List<Claim>(permissions.Select(p => new Claim(Permissions.Type, p)))
                     {
                         new Claim(DefineClaimTypes.UserId, user.Id.ToString()),
                         new Claim(ClaimTypes.NameIdentifier, user.UserName),
                         new Claim(ClaimTypes.Email, user.Email??user.UserName),
                         new Claim(ClaimTypes.Name, user.FullName),
-                        new Claim(ClaimTypes.Role, roleName),
+                        new Claim(ClaimTypes.Role, roleName)
                     };
 
                 var token = new JwtSecurityToken(

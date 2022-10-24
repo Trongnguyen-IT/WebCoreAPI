@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using WebCoreAPI.Models.Permission;
 
 namespace WebCoreAPI.Extensions
 {
@@ -10,7 +11,7 @@ namespace WebCoreAPI.Extensions
             foreach (var item in source.GetFields())
             {
                 var feature = (string)item.GetValue(source);
-                options.AddPolicy(feature, policyBuilder => policyBuilder.RequireClaim(feature));
+                options.AddPolicy(feature, policyBuilder => policyBuilder.RequireClaim(Permissions.Type, feature));
             }
 
             return options;

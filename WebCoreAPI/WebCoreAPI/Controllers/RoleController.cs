@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using WebCoreAPI.Models.Permission;
 using WebCoreAPI.Services;
 
 namespace WebCoreAPI.Controllers
@@ -23,6 +25,14 @@ namespace WebCoreAPI.Controllers
         public async Task<IActionResult> Assign(int userId, int roleId)
         {
             return Ok(await _roleService.Assign(userId, roleId));
+        }
+
+        [HttpPost("AddPermission")]
+        [Authorize(Policy = "Role,Category")]
+        public async Task<IActionResult> AddPermission(PermissionCreateOrUpdateDto input)
+        {
+            await _roleService.AddPermission(input);
+            return Ok();
         }
     }
 }
