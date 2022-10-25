@@ -28,7 +28,8 @@ namespace WebCoreAPI.Controllers
         }
 
         [HttpPost("AddPermission")]
-        [Authorize(Policy = "Role,Category")]
+        [Authorize(Policy = "User")]
+        [Authorize(Policy = "Role")]
         public async Task<IActionResult> AddPermission(PermissionCreateOrUpdateDto input)
         {
             await _roleService.AddPermission(input);

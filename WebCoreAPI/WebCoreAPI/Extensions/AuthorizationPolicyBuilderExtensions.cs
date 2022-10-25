@@ -1,20 +1,20 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using WebCoreAPI.Models.Permission;
+using WebCoreAPI.Permission;
 
 namespace WebCoreAPI.Extensions
 {
     public static class AuthorizationPolicyBuilderExtensions
     {
-        public static AuthorizationOptions AddAuthorizationPolicy(this AuthorizationOptions options)
+        public static AuthorizationOptions AddAuthorizationPolicy(this AuthorizationOptions option)
         {
             var source = typeof(UserFeatures);
             foreach (var item in source.GetFields())
             {
                 var feature = (string)item.GetValue(source);
-                options.AddPolicy(feature, policyBuilder => policyBuilder.RequireClaim(Permissions.Type, feature));
+                option.AddPolicy(feature, policy => policy.Requirements.Add(new PermissionAuthorizationRequirement(feature)));
             }
 
-            return options;
+            return option;
         }
     }
 }

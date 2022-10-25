@@ -74,7 +74,7 @@ namespace WebCoreAPI.Controllers
                 var audience = _appSettings.Audience;
                 var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.SecretKey));
                 var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-                var claims = new List<Claim>(permissions.Select(p => new Claim(Permissions.Type, p)))
+                var claims = new List<Claim>//(permissions.Select(p => new Claim(Permissions.Type, p)))
                     {
                         new Claim(DefineClaimTypes.UserId, user.Id.ToString()),
                         new Claim(ClaimTypes.NameIdentifier, user.UserName),
