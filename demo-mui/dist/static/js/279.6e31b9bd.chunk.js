@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkreact_spa=self.webpackChunkreact_spa||[]).push([[279],{279:function(r,e,a){a.r(e);var c=a(944);e.default=ErrorPage=()=>(0,c.tZ)("p",{children:" Error"})}}]);
