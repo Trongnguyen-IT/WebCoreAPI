@@ -4,7 +4,6 @@
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.10.5",
-    "@emotion/styled": "^11.10.5",
     "@fontsource/roboto": "^4.5.8",
     "@mui/material": "^5.10.17",
     "@testing-library/jest-dom": "^5.16.5",
@@ -44,6 +43,8 @@
     "@emotion/babel-plugin": "^11.10.5",
     "babel-plugin-module-resolver": "^4.1.0",
     "customize-cra": "^1.0.0",
-    "react-app-rewired": "^2.2.1"
+    "react-app-rewired": "^2.2.1",
+    "@babel/plugin-transform-react-jsx": "^7.19.0",
+    "@babel/preset-react": "^7.18.6"
   }
 }
