@@ -3,6 +3,10 @@ import { Swiper, SwiperSlide } from "swiper/react";
 
 // Import Swiper styles
 import "swiper/css";
+import banner1 from "~/assets/banners/banner1.jpg";
+import banner2 from "~/assets/banners/banner2.jpg";
+import banner3 from "~/assets/banners/banner3.jpg";
+import banner4 from "~/assets/banners/banner4.jpg";
 
 function Banner() {
   return (
@@ -13,22 +17,16 @@ function Banner() {
       onSwiper={(swiper) => console.log(swiper)}
     >
       <SwiperSlide>
-        <img src="../public/images/banners/1.jpg" />
+        <img src={banner1} />
       </SwiperSlide>
       <SwiperSlide>
-        <img src="../public/images/banners/2.jpg" />
+        <img src={banner2} />
       </SwiperSlide>
       <SwiperSlide>
-        <img src="../public/images/banners/3.jpg" />
+        <img src={banner3} />
       </SwiperSlide>
       <SwiperSlide>
-        <img src="../public/images/banners/4.jpg" />
-      </SwiperSlide>
-      <SwiperSlide>
-        <img src="../public/images/banners/5.jpg" />
-      </SwiperSlide>
-      <SwiperSlide>
-        <img src="../public/images/banners/6.jpg" />
+        <img src={banner4} />
       </SwiperSlide>
     </Swiper>
   );
