@@ -7,27 +7,29 @@ import banner1 from "~/assets/banners/banner1.jpg";
 import banner2 from "~/assets/banners/banner2.jpg";
 import banner3 from "~/assets/banners/banner3.jpg";
 import banner4 from "~/assets/banners/banner4.jpg";
-
+import { css } from "@emotion/react";
+const banners = [banner1, banner2, banner3, banner4];
 function Banner() {
   return (
     <Swiper
       spaceBetween={50}
-      slidesPerView={3}
+      slidesPerView={1}
       onSlideChange={() => console.log("slide change")}
       onSwiper={(swiper) => console.log(swiper)}
     >
-      <SwiperSlide>
-        <img src={banner1} />
-      </SwiperSlide>
-      <SwiperSlide>
-        <img src={banner2} />
-      </SwiperSlide>
-      <SwiperSlide>
-        <img src={banner3} />
-      </SwiperSlide>
-      <SwiperSlide>
-        <img src={banner4} />
-      </SwiperSlide>
+      {banners.map((item, index) => (
+        <SwiperSlide>
+          <img
+            src={item}
+            alt={item}
+            css={css`
+          object-fit: cover;
+          max-height: 500px;
+          width: 100%
+          `}
+          />
+        </SwiperSlide>
+      ))}
     </Swiper>
   );
 }
