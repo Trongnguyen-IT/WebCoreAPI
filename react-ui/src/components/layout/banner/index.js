@@ -6,9 +6,8 @@ import "swiper/css";
 import banner1 from "~/assets/banners/banner1.jpg";
 import banner2 from "~/assets/banners/banner2.jpg";
 import banner3 from "~/assets/banners/banner3.jpg";
-import banner4 from "~/assets/banners/banner4.jpg";
 import { css } from "@emotion/react";
-const banners = [banner1, banner2, banner3, banner4];
+const banners = [banner1, banner2, banner3];
 function Banner() {
   return (
     <Swiper
@@ -18,15 +17,15 @@ function Banner() {
       onSwiper={(swiper) => console.log(swiper)}
     >
       {banners.map((item, index) => (
-        <SwiperSlide>
+        <SwiperSlide key={index}>
           <img
             src={item}
             alt={item}
             css={css`
-          object-fit: cover;
-          max-height: 500px;
-          width: 100%
-          `}
+              object-fit: cover;
+              max-height: 1080px;
+              width: 100%;
+            `}
           />
         </SwiperSlide>
       ))}
