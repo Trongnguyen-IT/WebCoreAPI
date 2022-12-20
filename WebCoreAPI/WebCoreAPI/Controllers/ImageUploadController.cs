@@ -10,7 +10,7 @@ namespace WebCoreAPI.Controllers
     public class ImageUploadController : ControllerBase
     {
         private readonly StoreAccountAppSettings _storeAccountAppSettings;
-        private readonly IUploadImageService  _uploadImageService;
+        private readonly IUploadImageService _uploadImageService;
         public ImageUploadController(IOptions<StoreAccountAppSettings> options,
             IUploadImageService uploadImageService)
         {
@@ -21,8 +21,8 @@ namespace WebCoreAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var (uri,blobItems) = await _uploadImageService.GetImagesAsync(10);
-            return Ok(new { uri,blobItems }); ;
+            var (uri, blobItems) = await _uploadImageService.GetImagesAsync(10);
+            return Ok(new { uri, blobItems }); ;
         }
 
 

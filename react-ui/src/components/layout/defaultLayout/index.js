@@ -2,6 +2,7 @@ import Header from "../header";
 import Sidebar from "../sidebar";
 import Banner from "../banner";
 import Container from "@mui/material/Container";
+import Grid from "@mui/material/Grid";
 
 function DefaultLayout({ children }) {
   return (
@@ -9,8 +10,14 @@ function DefaultLayout({ children }) {
       <Header />
       <Banner />
       <Container maxWidth="lg">
-        <Sidebar />
-        <div className="content">{children}</div>
+        <Grid container spacing={2}>
+          <Grid item xs={4}>
+            <Sidebar />
+          </Grid>
+          <Grid item xs={8}>
+            <div className="content">{children}</div>
+          </Grid>
+        </Grid>
       </Container>
     </Container>
   );

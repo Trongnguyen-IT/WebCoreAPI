@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import AdbIcon from "@mui/icons-material/Adb";
 import { publicRoutes as routes } from "~/routes";
-import Link from "@mui/material/Link";
+import { Link } from "react-router-dom";
 
 function Header() {
   return (
@@ -35,8 +35,8 @@ function Header() {
             {routes.map((item, index) => (
               <Link
                 key={index}
-                sx={{
-                  m: 2,
+                css={{
+                  marginRight: "1rem",
                   color: "#333",
                   display: "inline-block",
                   textDecoration: "none",
@@ -47,7 +47,7 @@ function Header() {
                     msTransitionDuration: "0.4s",
                   },
                 }}
-                href={item.path}
+                to={item.path}
               >
                 {item.name}
               </Link>
