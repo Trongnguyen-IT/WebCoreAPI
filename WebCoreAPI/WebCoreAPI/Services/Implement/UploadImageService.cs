@@ -14,13 +14,13 @@ namespace WebCoreAPI.Services
         {
             _storeAccountAppSettings = options.Value;
         }
-        private async Task<IEnumerable<string>> ListBlobsHierarchicalListing(BlobContainerClient container,
+        private async Task<IEnumerable<BlobItem>> ListBlobsHierarchicalListing(BlobContainerClient container,
             string prefix,
             int? segmentSize)
         {
             try
             {
-                var blobNames = new List<string>();
+                var blobItems = new List<BlobItem>();
                 // Call the listing operation and return pages of the specified size.
                 var resultSegment = container.GetBlobsByHierarchyAsync(prefix: prefix, delimiter: "/")
                     .AsPages(default, segmentSize);
@@ -38,20 +38,20 @@ namespace WebCoreAPI.Services
 
                             // Call recursively with the prefix to traverse the virtual directory.
                             var res = await ListBlobsHierarchicalListing(container, blobhierarchyItem.Prefix, null);
-                            blobNames.AddRange(res);
+                            blobItems.AddRange(res);
                         }
                         else
                         {
                             // Write out the name of the blob.
                             Console.WriteLine("Blob name: {0}", blobhierarchyItem.Blob.Name);
-                            blobNames.Add(blobhierarchyItem.Blob.Name);
+                            blobItems.Add(blobhierarchyItem.Blob);
                         }
                     }
 
                     Console.WriteLine();
                 }
 
-                return blobNames;
+                return blobItems;
             }
             catch (RequestFailedException e)
             {
@@ -61,13 +61,13 @@ namespace WebCoreAPI.Services
             }
         }
 
-        public async Task<IEnumerable<string>> GetImagesAsync(int? segmentSize)
+        public async Task<(Uri uri, IEnumerable<BlobItem> blobItems)> GetImagesAsync(int? segmentSize)
         {
             var blobServiceClient = new BlobServiceClient(_storeAccountAppSettings.AzureWebJobsStorage);
             var container = await GetBlobContainerClient(blobServiceClient, _storeAccountAppSettings.ContainerName);
-            var containerUri = container.Uri;
-            var blobNames = await ListBlobsHierarchicalListing(container, "uploads", 10);
-            return blobNames.Select(p =>$"{containerUri }/{ p }");
+            var uri = container.Uri;
+            var blobItems = await ListBlobsHierarchicalListing(container, "uploads", 10);
+            return (uri, blobItems);// blobNames.Select(p =>$"{containerUri }/{ p }");
         }
 
         public async Task<BlobClient> UploadImageAsync(IFormFile file)
