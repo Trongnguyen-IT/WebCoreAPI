@@ -5,6 +5,8 @@ using WebCoreAPI.Services;
 
 namespace WebCoreAPI.Controllers
 {
+    [ApiController]
+    [Route("api/[controller]")]
     public class ImageUploadController : ControllerBase
     {
         private readonly StoreAccountAppSettings _storeAccountAppSettings;
@@ -17,9 +19,10 @@ namespace WebCoreAPI.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Get()
         {
-            return Ok(); ;
+            var result = await _uploadImageService.GetImagesAsync(10);
+            return Ok(result); ;
         }
 
 
