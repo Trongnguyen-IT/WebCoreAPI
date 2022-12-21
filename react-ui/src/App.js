@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { publicRoutes } from "~/routes";
-import DefaultLayout from "~/layout";
-import { Fragment } from "react";
+import DefaultLayout, { OnlyMenuLayout } from "~/layout";
 import { Global } from "@emotion/react";
 
 function App() {
@@ -21,7 +20,8 @@ function App() {
         />
         <Routes>
           {publicRoutes.map((route, index) => {
-            const Layout = route.layout === null ? Fragment : DefaultLayout;
+            const Layout =
+              route.layout === null ? OnlyMenuLayout : DefaultLayout;
             const Page = route.component;
             return (
               <Route

@@ -27,9 +27,9 @@ namespace WebCoreAPI.Controllers
 
 
         [HttpPost("upload/image")]
-        public async Task<IActionResult> UploadImage(IFormFile file)
+        public async Task<IActionResult> UploadImage(ImageCreateOrUpdateDto input)
         {
-            var result = await _uploadImageService.UploadImageAsync(file);
+            var result = await _uploadImageService.UploadImageAsync(input);
             return Ok(result);
         }
     }

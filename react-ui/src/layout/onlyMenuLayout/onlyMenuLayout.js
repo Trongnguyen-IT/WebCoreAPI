@@ -2,18 +2,17 @@ import { Header, Sidebar, Banner } from "~/layout";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 
-function DefaultLayout({ children }) {
+function OnlyMenuLayout({ children }) {
   return (
     <Container maxWidth="xl" disableGutters>
       <Header />
-      <Banner />
       <Container maxWidth="lg">
         <Grid container spacing={2}>
           <Grid item xs={3}>
             <Sidebar />
           </Grid>
           <Grid item xs={9}>
-            <div className="content">{children}</div>
+            {children}
           </Grid>
         </Grid>
       </Container>
@@ -21,4 +20,4 @@ function DefaultLayout({ children }) {
   );
 }
 
-export default DefaultLayout;
+export default OnlyMenuLayout;

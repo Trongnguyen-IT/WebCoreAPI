@@ -78,6 +78,7 @@ builder.Services.AddScoped<IRoleService, RoleService>();
 //builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IImageUploadRepository, ImageUploadRepository>();
 builder.Services.AddScoped<IUploadImageService, UploadImageService>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped(typeof(IGenericDbContext<>), typeof(GenericDbContext<>));

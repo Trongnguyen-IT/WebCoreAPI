@@ -3,16 +3,20 @@ using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Microsoft.Extensions.Options;
 using WebCoreAPI.Models;
+using WebCoreAPI.Repositories;
 
 namespace WebCoreAPI.Services
 {
     public class UploadImageService : IUploadImageService
     {
         private readonly StoreAccountAppSettings _storeAccountAppSettings;
+        private readonly IImageUploadRepository  _imageUploadRepository;
 
-        public UploadImageService(IOptions<StoreAccountAppSettings> options)
+        public UploadImageService(IOptions<StoreAccountAppSettings> options,
+            IImageUploadRepository imageUploadRepositor)
         {
             _storeAccountAppSettings = options.Value;
+            _imageUploadRepository = imageUploadRepositor;
         }
         private async Task<IEnumerable<BlobItem>> ListBlobsHierarchicalListing(BlobContainerClient container,
             string prefix,
@@ -70,11 +74,11 @@ namespace WebCoreAPI.Services
             return (uri, blobItems);// blobNames.Select(p =>$"{containerUri }/{ p }");
         }
 
-        public async Task<BlobClient> UploadImageAsync(IFormFile file)
+        public async Task<BlobClient> UploadImageAsync(ImageCreateOrUpdateDto input)
         {
             string localPath = "uploads";
             Directory.CreateDirectory(localPath);
-            var localFilePath = Path.Combine(localPath, $"{file.Name}_{Guid.NewGuid().ToString()}{Path.GetExtension(file.FileName)}");
+            var localFilePath = Path.Combine(localPath, $"{input.Name}_{Guid.NewGuid().ToString()}{Path.GetExtension(input.File.FileName)}");
 
             var blobServiceClient = new BlobServiceClient(_storeAccountAppSettings.AzureWebJobsStorage);
             var container = await GetBlobContainerClient(blobServiceClient, _storeAccountAppSettings.ContainerName);
@@ -83,7 +87,7 @@ namespace WebCoreAPI.Services
             await using (FileStream fileStream = new(localFilePath, FileMode.Create))
             {
                 //file.CopyTo(fileStream);
-                var stream = file.OpenReadStream();
+                var stream = input.File.OpenReadStream();
                 BinaryReader reader = new BinaryReader(stream);
 
                 byte[] buffer = new byte[fileStream.Length];
@@ -96,6 +100,13 @@ namespace WebCoreAPI.Services
 
                 fileStream.Close();
             }
+
+            _imageUploadRepository.Insert(new Entity.Image
+            {
+                Name = input.Name,
+                Description = input.Description,
+                Url = blobClient.Uri.ToString()
+            });
 
             return blobClient;
         }

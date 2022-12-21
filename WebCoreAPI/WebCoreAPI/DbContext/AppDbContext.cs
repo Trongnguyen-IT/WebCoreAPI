@@ -19,6 +19,7 @@ namespace WebCoreAPI.DbContext
         public override DbSet<AppUserRole> UserRoles { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<Image> Images { get; set; }
         #endregion
 
 
