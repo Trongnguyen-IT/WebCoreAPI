@@ -1,6 +1,4 @@
-import Header from "../header";
-import Sidebar from "../sidebar";
-import Banner from "../banner";
+import { Header, Sidebar, Banner } from "~/layout";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 

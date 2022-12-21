@@ -5,7 +5,7 @@ import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import Stack from "@mui/material/Stack";
 import { useEffect, useState } from "react";
 import { css } from "@emotion/react";
-import request from "~/utils/request";
+import { uploadImage } from '~/services/uploadService'
 
 function UploadImage() {
   const [fileSelected, setFileSelected] = useState(undefined);
@@ -27,16 +27,14 @@ function UploadImage() {
     submit(formData);
   };
 
-  const submit = (file) => {
+  const submit = async (file) => {
     console.log(file);
-    request
-      .post("ImageUpload/upload/image/", file)
-      .then(function (response) {
-        console.log(response);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+    try {
+      const result = await uploadImage('ImageUpload/upload/image/', file)
+      console.log('result', result);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (

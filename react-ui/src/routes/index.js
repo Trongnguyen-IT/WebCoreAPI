@@ -1,13 +1,14 @@
 import Home from "~/pages/home";
 import Product from "~/pages/product";
 import Contact from "~/pages/contact";
-import ImageLoad from "~/components/imageUpload/imageUpload";
+import ImageUpload from "~/components/imageUpload";
+import config from "~/config";
 
 const publicRoutes = [
-  { path: "/", name: "Home", component: Home },
-  { path: "/product", name: "Product", component: Product },
-  { path: "/upload-image", name: "UploadImage", component: ImageLoad },
-  { path: "/contact", name: "Contact", component: Contact, layout: null },
+  { path: config.routes.home, name: "Home", component: Home },
+  { path: config.routes.product, name: "Product", component: Product },
+  { path: config.routes.uploadImage, name: "UploadImage", component: ImageUpload },
+  { path: config.routes.contact, name: "Contact", component: Contact, layout: null },
 ];
 
 const priveRoutes = [];
