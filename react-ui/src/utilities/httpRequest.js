@@ -4,6 +4,8 @@ const httpRequest = axios.create({
   baseURL: process.env.REACT_APP_API_ENDPOINT,
   timeout: 3000,
 });
+
+httpRequest.defaults.headers.common['Authorization'] = 'AUTH_TOKEN';
 // Add a request interceptor
 httpRequest.interceptors.request.use(function (config) {
   console.log('config', config);
