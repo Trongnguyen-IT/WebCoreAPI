@@ -1,18 +1,13 @@
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
-import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import Stack from "@mui/material/Stack";
-import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
 import ImageList from "@mui/material/ImageList";
 import ImageListItem from "@mui/material/ImageListItem";
 import ImageListItemBar from "@mui/material/ImageListItemBar";
 import TextField from "@mui/material/TextField";
-import CloudUpload from '@mui/icons-material/CloudUpload';
 import { useEffect, useState } from "react";
-import { css } from "@emotion/react";
-import { uploadImage } from "~/services/uploadService";
+import { uploadImage } from "~/services/photoManagerService";
 import { ImageUpload } from "~/components/photoManager";
 
 function PhotoManager() {
@@ -20,7 +15,11 @@ function PhotoManager() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [url, setUrl] = useState("");
-  const [files, setFiles] = useState([]);
+  const [images, setImages] = useState([]);
+
+  useEffect(() => {
+    return () => fileSelected && URL.revokeObjectURL(fileSelected.previewUrl);
+  });
 
   useEffect(() => {
     return () => fileSelected && URL.revokeObjectURL(fileSelected.previewUrl);
@@ -73,42 +72,16 @@ function PhotoManager() {
           variant="standard"
           value={url}
         />
-        <Stack direction="row" alignItems="center" spacing={2} sx={{mt:2}}>
-          <ImageUpload callbackSetUrl={setUrl}/>
+        <Stack direction="row" alignItems="center" spacing={2} sx={{ mt: 2 }}>
+          <ImageUpload callbackSetUrl={setUrl} />
         </Stack>
         <Button variant="contained" onClick={handleSubmit}>
           Update
         </Button>
-        {/* <div
-          css={css`
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 1rem;
-          `}
-        >
-          <input
-            type="file"
-            onChange={handleChange}
-            css={css`
-              margin-bottom: 1rem;
-            `}
-          ></input>
-          {fileSelected && (
-            <img
-              src={fileSelected.previewUrl}
-              alt={fileSelected.name}
-              css={css`
-                object-fit: contain;
-                width: 45%;
-                height: auto;
-              `}
-            />
-          )}
-        </div> */}
       </Box>
       <Box sx={{ p: 2, mt: 2, border: "1px solid grey" }}>
         <ImageList sx={{ width: "100%", height: "100%" }} cols={3}>
-          {files.map((item, index) => (
+          {images.map((item, index) => (
             <ImageListItem key={index}>
               <img
                 src={`${item.img}?w=248&fit=crop&auto=format`}

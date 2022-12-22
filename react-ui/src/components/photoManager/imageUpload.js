@@ -2,7 +2,7 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
-import { uploadImage } from "~/services/uploadService";
+import { uploadImage } from "~/services/photoManagerService";
 import { useState } from "react";
 import Skeleton from '@mui/material/Skeleton';
 import UploadImageDialog from './uploadImageDialog'
