@@ -6,7 +6,7 @@ using WebCoreAPI.Services;
 namespace WebCoreAPI.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     public class ImageUploadController : ControllerBase
     {
         private readonly StoreAccountAppSettings _storeAccountAppSettings;
@@ -26,10 +26,17 @@ namespace WebCoreAPI.Controllers
         }
 
 
-        [HttpPost("upload/image")]
-        public async Task<IActionResult> UploadImage(ImageCreateOrUpdateDto input)
+        [HttpPost]
+        public async Task<IActionResult> CreateImage(ImageCreateOrUpdateDto input)
         {
-            var result = await _uploadImageService.UploadImageAsync(input);
+            await _uploadImageService.CreateImage(input);
+            return Ok();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UploadImage(IFormFile file)
+        {
+            var result = await _uploadImageService.UploadImageAsync(file);
             return Ok(result);
         }
     }

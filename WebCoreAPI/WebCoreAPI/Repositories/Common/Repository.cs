@@ -47,6 +47,12 @@ namespace WebCoreAPI.Repositories.Common
         {
             table.Add(obj);
         }
+        
+        public async Task InsertAsync (T obj)
+        {
+            table.Add(obj);
+            await _dbContext.SaveChangesAsync();
+        }
 
         public void Save()
         {

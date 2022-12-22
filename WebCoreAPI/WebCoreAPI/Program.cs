@@ -117,7 +117,7 @@ builder.Services
 builder.Services.AddAuthorization(options => options.AddAuthorizationPolicy());
 
 var app = builder.Build();
-
+app.UseCors();
 // response ExceptionHandler
 app.UseExceptionHandler(c => c.Run(async context =>
 {

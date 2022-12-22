@@ -2,13 +2,13 @@ import axios from "axios";
 
 const httpRequest = axios.create({
   baseURL: process.env.REACT_APP_API_ENDPOINT,
-  timeout: 3000,
+  timeout: 30000,
 });
 
 httpRequest.defaults.headers.common['Authorization'] = 'AUTH_TOKEN';
 // Add a request interceptor
 httpRequest.interceptors.request.use(function (config) {
-  console.log('config', config);
+  //console.log('config', config);
   // Do something before request is sent
   return config;
 }, function (error) {
@@ -18,7 +18,7 @@ httpRequest.interceptors.request.use(function (config) {
 
 // Add a response interceptor
 httpRequest.interceptors.response.use(function (response) {
-  console.log('response', response);
+  //console.log('response', response);
   // Any status code that lie within the range of 2xx cause this function to trigger
   // Do something with response data
   return response;

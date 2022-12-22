@@ -9,11 +9,13 @@ import ImageList from "@mui/material/ImageList";
 import ImageListItem from "@mui/material/ImageListItem";
 import ImageListItemBar from "@mui/material/ImageListItemBar";
 import TextField from "@mui/material/TextField";
+import CloudUpload from '@mui/icons-material/CloudUpload';
 import { useEffect, useState } from "react";
 import { css } from "@emotion/react";
 import { uploadImage } from "~/services/uploadService";
+import { ImageUpload } from "~/components/photoManager";
 
-function UploadImage() {
+function PhotoManager() {
   const [fileSelected, setFileSelected] = useState(undefined);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -30,24 +32,17 @@ function UploadImage() {
     setFileSelected(file);
   };
 
-  const handleUpload = () => {
-    const formData = new FormData();
-    formData.append("file", fileSelected);
-
-    submit(formData);
-  };
-
-  const submit = async (file) => {
-    console.log(file);
-    const payload = {
+  const handleSubmit = async () => {
+    const request = {
       name: name,
       description: description,
-      file: file,
+      url: url,
     };
-    console.log('payload',payload);
+
+    console.log(request);
     try {
-      //const result = await uploadImage("ImageUpload/upload/image/", payload);
-      //console.log("result", result);
+      const result = await uploadImage("ImageUpload/CreateImage", request);
+      console.log("result", result);
     } catch (error) {
       console.error(error);
     }
@@ -71,62 +66,18 @@ function UploadImage() {
           onChange={(e) => setDescription(e.target.value)}
         />
         <TextField
+          disabled
           fullWidth
           id="standard-basic"
           label="Url"
           variant="standard"
-          onChange={(e) => setName(e.target.value)}
+          value={url}
         />
-        <Stack direction="row" alignItems="center" spacing={2}>
-          <div
-            css={css`
-              display: flex;
-              flex-direction: column;
-              align-items: start;
-              margin-bottom: 1rem;
-            `}
-          >
-            <IconButton
-              color="primary"
-              aria-label="upload picture"
-              component="label"
-            >
-              <input
-                id="fileUpload"
-                hidden
-                accept="image/*"
-                multiple
-                type="file"
-                onChange={handleChange}
-                css={css`
-                  margin-bottom: 1rem;
-                `}
-              />
-              <PhotoCamera />
-              <label
-                htmlFor="fileUpload"
-                css={css`
-                  font-size: 0.875rem;
-                `}
-              >
-                Choose File
-              </label>
-            </IconButton>
-            {fileSelected && (
-              <img
-                src={fileSelected.previewUrl}
-                alt={fileSelected.name}
-                css={css`
-                  object-fit: contain;
-                  width: 45%;
-                  height: auto;
-                `}
-              />
-            )}
-          </div>
+        <Stack direction="row" alignItems="center" spacing={2} sx={{mt:2}}>
+          <ImageUpload callbackSetUrl={setUrl}/>
         </Stack>
-        <Button variant="contained" onClick={handleUpload}>
-          Submit
+        <Button variant="contained" onClick={handleSubmit}>
+          Update
         </Button>
         {/* <div
           css={css`
@@ -178,4 +129,4 @@ function UploadImage() {
   );
 }
 
-export default UploadImage;
+export default PhotoManager;

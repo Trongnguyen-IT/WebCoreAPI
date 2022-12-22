@@ -10,7 +10,7 @@ namespace WebCoreAPI.Services
     public class UploadImageService : IUploadImageService
     {
         private readonly StoreAccountAppSettings _storeAccountAppSettings;
-        private readonly IImageUploadRepository  _imageUploadRepository;
+        private readonly IImageUploadRepository _imageUploadRepository;
 
         public UploadImageService(IOptions<StoreAccountAppSettings> options,
             IImageUploadRepository imageUploadRepositor)
@@ -74,11 +74,11 @@ namespace WebCoreAPI.Services
             return (uri, blobItems);// blobNames.Select(p =>$"{containerUri }/{ p }");
         }
 
-        public async Task<BlobClient> UploadImageAsync(ImageCreateOrUpdateDto input)
+        public async Task<BlobClient> UploadImageAsync(IFormFile file)
         {
             string localPath = "uploads";
             Directory.CreateDirectory(localPath);
-            var localFilePath = Path.Combine(localPath, $"{input.Name}_{Guid.NewGuid().ToString()}{Path.GetExtension(input.File.FileName)}");
+            var localFilePath = Path.Combine(localPath, $"{file.Name}_{Guid.NewGuid().ToString()}{Path.GetExtension(file.FileName)}");
 
             var blobServiceClient = new BlobServiceClient(_storeAccountAppSettings.AzureWebJobsStorage);
             var container = await GetBlobContainerClient(blobServiceClient, _storeAccountAppSettings.ContainerName);
@@ -87,7 +87,7 @@ namespace WebCoreAPI.Services
             await using (FileStream fileStream = new(localFilePath, FileMode.Create))
             {
                 //file.CopyTo(fileStream);
-                var stream = input.File.OpenReadStream();
+                var stream = file.OpenReadStream();
                 BinaryReader reader = new BinaryReader(stream);
 
                 byte[] buffer = new byte[fileStream.Length];
@@ -101,13 +101,6 @@ namespace WebCoreAPI.Services
                 fileStream.Close();
             }
 
-            _imageUploadRepository.Insert(new Entity.Image
-            {
-                Name = input.Name,
-                Description = input.Description,
-                Url = blobClient.Uri.ToString()
-            });
-
             return blobClient;
         }
 
@@ -117,6 +110,16 @@ namespace WebCoreAPI.Services
             await container.CreateIfNotExistsAsync(PublicAccessType.Blob);
 
             return container;
+        }
+
+        public async Task CreateImage(ImageCreateOrUpdateDto input)
+        {
+            await _imageUploadRepository.InsertAsync(new Entity.Image
+            {
+                Name = input.Name,
+                Description = input.Description,
+                Url = input.Url
+            });
         }
     }
 }

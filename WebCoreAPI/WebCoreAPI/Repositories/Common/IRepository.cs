@@ -9,6 +9,7 @@ namespace WebCoreAPI.Repositories.Common
         T GetById(object id);
         T GetSingle(Expression<Func<T, bool>> predicate);
         void Insert(T obj);
+        Task InsertAsync(T obj);
         void Update(T obj);
         void Delete(object id);
         void Save();
