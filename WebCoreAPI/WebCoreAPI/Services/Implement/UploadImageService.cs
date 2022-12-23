@@ -1,7 +1,9 @@
 ﻿using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using WebCoreAPI.Entity;
 using WebCoreAPI.Models;
 using WebCoreAPI.Repositories;
 
@@ -18,6 +20,12 @@ namespace WebCoreAPI.Services
             _storeAccountAppSettings = options.Value;
             _imageUploadRepository = imageUploadRepositor;
         }
+
+        public async Task<IEnumerable<Image>> GetAllAsync()
+        {
+            return await _imageUploadRepository.GetAll().ToListAsync();
+        }
+
         private async Task<IEnumerable<BlobItem>> ListBlobsHierarchicalListing(BlobContainerClient container,
             string prefix,
             int? segmentSize)
@@ -65,7 +73,7 @@ namespace WebCoreAPI.Services
             }
         }
 
-        public async Task<(Uri uri, IEnumerable<BlobItem> blobItems)> GetImagesAsync(int? segmentSize)
+        public async Task<(Uri uri, IEnumerable<BlobItem> blobItems)> GetImagesFromBlobAsync(int? segmentSize)
         {
             var blobServiceClient = new BlobServiceClient(_storeAccountAppSettings.AzureWebJobsStorage);
             var container = await GetBlobContainerClient(blobServiceClient, _storeAccountAppSettings.ContainerName);

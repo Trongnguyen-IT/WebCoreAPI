@@ -2,7 +2,7 @@ import axios from "axios";
 
 const httpRequest = axios.create({
   baseURL: process.env.REACT_APP_API_ENDPOINT,
-  timeout: 30000,
+  timeout: 3000,
 });
 
 httpRequest.defaults.headers.common['Authorization'] = 'AUTH_TOKEN';
@@ -25,6 +25,7 @@ httpRequest.interceptors.response.use(function (response) {
 }, function (error) {
   // Any status codes that falls outside the range of 2xx cause this function to trigger
   // Do something with response error
+  console.log(error);
   return Promise.reject(error);
 });
 

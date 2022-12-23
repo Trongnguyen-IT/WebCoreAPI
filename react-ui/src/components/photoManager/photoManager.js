@@ -7,30 +7,28 @@ import ImageListItem from "@mui/material/ImageListItem";
 import ImageListItemBar from "@mui/material/ImageListItemBar";
 import TextField from "@mui/material/TextField";
 import { useEffect, useState } from "react";
-import { uploadImage } from "~/services/photoManagerService";
+import { getImages, uploadImage } from "~/services/photoManagerService";
 import { ImageUpload } from "~/components/photoManager";
+import { useLoaderData } from "react-router-dom";
 
 function PhotoManager() {
-  const [fileSelected, setFileSelected] = useState(undefined);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [url, setUrl] = useState("");
   const [images, setImages] = useState([]);
 
   useEffect(() => {
-    return () => fileSelected && URL.revokeObjectURL(fileSelected.previewUrl);
-  });
+    loadData()
+  },[])
 
-  useEffect(() => {
-    return () => fileSelected && URL.revokeObjectURL(fileSelected.previewUrl);
-  }, [fileSelected]);
-
-  const handleChange = (e) => {
-    const file = e.target.files[0];
-    file.previewUrl = URL.createObjectURL(file);
-    setFileSelected(file);
-  };
-
+  const loadData = async () => {
+    const param = {
+      name: 'abc'
+    }
+    const result = await getImages('ImageUpload/Get', param)
+    console.log('result', result);
+    result && result.data && setImages(result.data)
+  }
   const handleSubmit = async () => {
     const request = {
       name: name,
@@ -38,10 +36,10 @@ function PhotoManager() {
       url: url,
     };
 
-    console.log(request);
     try {
       const result = await uploadImage("ImageUpload/CreateImage", request);
-      console.log("result", result);
+      await loadData()
+
     } catch (error) {
       console.error(error);
     }
@@ -73,31 +71,31 @@ function PhotoManager() {
           value={url}
         />
         <Stack direction="row" alignItems="center" spacing={2} sx={{ mt: 2 }}>
-          <ImageUpload callbackSetUrl={setUrl} />
+          <ImageUpload onSetUrl={setUrl} />
         </Stack>
         <Button variant="contained" onClick={handleSubmit}>
           Update
         </Button>
       </Box>
-      <Box sx={{ p: 2, mt: 2, border: "1px solid grey" }}>
+      {images &&
         <ImageList sx={{ width: "100%", height: "100%" }} cols={3}>
           {images.map((item, index) => (
             <ImageListItem key={index}>
               <img
-                src={`${item.img}?w=248&fit=crop&auto=format`}
-                srcSet={`${item.img}?w=248&fit=crop&auto=format&dpr=2 2x`}
+                src={`${item.url}?w=248&fit=crop&auto=format`}
+                srcSet={`${item.url}?w=248&fit=crop&auto=format&dpr=2 2x`}
                 alt={item.title}
                 loading="lazy"
               />
               <ImageListItemBar
-                title={item.title}
-                subtitle={<span>by: {item.author}</span>}
+                title={item.name}
+                subtitle={<span>by: {item.description}</span>}
                 position="below"
               />
             </ImageListItem>
           ))}
         </ImageList>
-      </Box>
+      }
     </Container>
   );
 }

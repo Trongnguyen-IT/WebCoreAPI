@@ -21,7 +21,13 @@ namespace WebCoreAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var (uri, blobItems) = await _uploadImageService.GetImagesAsync(10);
+            return Ok(await _uploadImageService.GetAllAsync()); ;
+        }
+
+        [HttpGet("GetFromBlob")]
+        public async Task<IActionResult> GetFromBlob()
+        {
+            var (uri, blobItems) = await _uploadImageService.GetImagesFromBlobAsync(10);
             return Ok(new { uri, blobItems }); ;
         }
 

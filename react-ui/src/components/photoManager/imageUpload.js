@@ -3,16 +3,27 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import { uploadImage } from "~/services/photoManagerService";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Skeleton from '@mui/material/Skeleton';
 import UploadImageDialog from './uploadImageDialog'
+import Alert from '@mui/material/Alert';
+import IconButton from "@mui/material/IconButton";
+import CloudUpload from '@mui/icons-material/CloudUpload';
 
-function ImageUpload({ callbackSetUrl }) {
+function ImageUpload({ onSetUrl }) {
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(undefined);
-  const [url, setUrl] = useState('');
+  const [isAlert, setIsAlert] = useState(false);
+  const [fileSelected, setFileSelected] = useState(undefined);
+  const [url, setUrl] = useState(undefined);
 
-  const handleClickListItem = () => {
+  useEffect(() => {
+    console.log('fileSelected', fileSelected);
+    return () => {
+      fileSelected && URL.revokeObjectURL(fileSelected.previewUrl);
+    }
+  }, [fileSelected]);
+
+  const showModalUpload = () => {
     setOpen(true);
   };
 
@@ -22,54 +33,53 @@ function ImageUpload({ callbackSetUrl }) {
 
     try {
       const result = await uploadImage("ImageUpload/UploadImage", formData);
-      setUrl(result.data.uri)
-      callbackSetUrl(result.data.uri)
-      //setUrl(result.data)
+
+      if (result.status === 200) {
+        setUrl(result.data.uri)
+        onSetUrl(result.data.uri)
+        handleClose();
+      }
     } catch (error) {
-      console.error(error);
+      console.error('error', error.message);
     }
   };
 
   const handleClose = async (newValue) => {
-
     setOpen(false);
-
-    if (newValue) {
-      await handleUpload(newValue)
-    }
   };
 
   return (
     <Box sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-      <Stack direction="row"
-        justifyContent="flex-start"
-        alignItems="flex-end" spacing={2} sx={{ py: 2 }}>
-        {/* {url && <img src={url} alt={url} css={css`
-                  object-fit: contain;
-                  width: 45%;
-                  height: auto;
-                `} />} */}
-        {url ? (
-          <img
-            style={{ width: 210, height: 118 }}
-            alt={url}
-            src={url}
-          />
-        ) : (
-          <Skeleton variant="rectangular" width={210} height={118} />
-        )}
-
-
-        <Button size="small" variant="outlined" onClick={handleClickListItem}>
-          Select Photo
-        </Button>
-      </Stack>
+      <Box sx={{ width: '50%', height: 125, bgcolor: 'background.paper', border: '1px dashed grey', position:'relative',mb:2 }}>
+        <img
+          style={{ width: '100%', height: '100%' }}
+          alt={url}
+          src={url}
+        />
+        <Stack direction="row"
+          justifyContent="center"
+          alignItems="center"
+          spacing={2}
+          sx={{ height: '100%', position:'absolute',top:0,left:0,width:'100%', height:'100%' }}>
+          <IconButton
+            color="#fff"
+            aria-label="upload picture"
+            component="label"
+            size="small"
+            onClick={showModalUpload}
+          >
+            <CloudUpload sx={{ mr: 1 }} />
+            <label>Upload</label>
+          </IconButton>
+        </Stack>
+      </Box>
       <UploadImageDialog
         id="ringtone-menu"
         keepMounted
         open={open}
         onClose={handleClose}
-        value={value}
+        onSave={handleUpload}
+        fileSelected={fileSelected}
       />
     </Box>
   );
