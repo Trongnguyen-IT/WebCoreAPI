@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import AdbIcon from "@mui/icons-material/Adb";
 import { publicRoutes as routes } from "~/routes";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 function Header() {
   return (
@@ -33,7 +33,7 @@ function Header() {
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             {routes.map((item, index) => (
-              <Link
+              <NavLink
                 key={index}
                 css={{
                   marginRight: "1rem",
@@ -46,11 +46,14 @@ function Header() {
                     WebkitTransitionDuration: "0.4s",
                     msTransitionDuration: "0.4s",
                   },
+                  "&.active": {
+                    color: "#f16821",
+                  },
                 }}
                 to={item.path}
               >
                 {item.name}
-              </Link>
+              </NavLink>
             ))}
           </Box>
         </Toolbar>

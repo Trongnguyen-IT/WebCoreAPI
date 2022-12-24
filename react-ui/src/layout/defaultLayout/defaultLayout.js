@@ -13,7 +13,7 @@ function DefaultLayout({ children }) {
             <Sidebar />
           </Grid>
           <Grid item xs={9}>
-            <div className="content">{children}</div>
+            {/* {children} */}
           </Grid>
         </Grid>
       </Container>
