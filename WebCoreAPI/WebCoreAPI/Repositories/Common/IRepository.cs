@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace WebCoreAPI.Repositories.Common
+namespace WebCoreAPI.Repositories
 {
     public interface IRepository<T> where T : class
     {

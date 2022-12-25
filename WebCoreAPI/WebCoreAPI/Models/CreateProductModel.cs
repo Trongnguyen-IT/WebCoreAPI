@@ -9,9 +9,10 @@ namespace WebCoreAPI.Models
         [Required]
         public double Price { get; set; }
         [Required]
-        public string? ImageUrl { get; set; }
         public int Promotion { get; set; }
         public int Quantity { get; set; }
         public int? CategoryId { get; set; }
+        public string? AvatarUrl { get; set; }
+        public string[]? ImageUrls { get; set; }
     }
 }

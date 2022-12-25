@@ -37,7 +37,6 @@ namespace WebCoreAPI.Services
                     Price = product.Price,
                     Promotion = product.Promotion,
                     Quantity = product.Quantity,
-                    ImageUrl = product.ImageUrl,
                     CategoryId = product.CategoryId,
                     CreatedBy = product.CreatedBy,
                     DateCreated = product.DateCreated,
@@ -63,10 +62,10 @@ namespace WebCoreAPI.Services
                 Name = model.Name,
                 Price = model.Price,
                 Promotion = model.Promotion,
-                ImageUrl = model.ImageUrl,
                 CategoryId = model.CategoryId,
                 Quantity = model.Quantity,
-
+                AvatarUrl = model.AvatarUrl,
+                ImageUrls = model.ImageUrls
             };
             _productRepository.Insert(product);
             _productRepository.Save();
@@ -80,10 +79,11 @@ namespace WebCoreAPI.Services
                 product.Name = model.Name;
                 product.Price = model.Price;
                 product.Promotion = model.Promotion;
-                product.ImageUrl = model.ImageUrl;
                 product.CategoryId = model.CategoryId;
                 product.Quantity = model.Quantity;
                 product.LastModified = DateTime.Now;
+                product.AvatarUrl = model.AvatarUrl;
+                product.ImageUrls = model.ImageUrls;
 
                 _productRepository.Update(product);
                 _productRepository.Save();

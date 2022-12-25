@@ -18,11 +18,6 @@ namespace WebCoreAPI.Controllers
             _uploadImageService = uploadImageService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Get()
-        {
-            return Ok(await _uploadImageService.GetAllAsync()); ;
-        }
 
         [HttpGet("GetFromBlob")]
         public async Task<IActionResult> GetFromBlob()
@@ -33,14 +28,14 @@ namespace WebCoreAPI.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> CreateImage(ImageCreateOrUpdateDto input)
+        public async Task<IActionResult> UploadImage(IFormFile file)
         {
-            await _uploadImageService.CreateImage(input);
-            return Ok();
+            var filePath = await _uploadImageService.Upload (file);
+            return Ok(filePath);
         }
 
         [HttpPost]
-        public async Task<IActionResult> UploadImage(IFormFile file)
+        public async Task<IActionResult> UploadImageToBlobStore(IFormFile file)
         {
             var result = await _uploadImageService.UploadImageAsync(file);
             return Ok(result);

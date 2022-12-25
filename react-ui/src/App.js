@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { publicRoutes } from "~/routes";
 import DefaultLayout, { OnlyMenuLayout } from "~/layout";
+import AdminLayout from "./adminLayout";
 import { Global } from "@emotion/react";
 
 function App() {
@@ -21,7 +22,12 @@ function App() {
         <Routes>
           {publicRoutes.map((route, index) => {
             const Layout =
-              route.layout === null ? OnlyMenuLayout : DefaultLayout;
+              route.layout === "admin"
+                ? AdminLayout
+                : route.layout === null
+                ? OnlyMenuLayout
+                : DefaultLayout;
+
             const Page = route.component;
             return (
               <Route

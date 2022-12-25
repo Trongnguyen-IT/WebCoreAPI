@@ -19,7 +19,7 @@ namespace WebCoreAPI.DbContext
         public override DbSet<AppUserRole> UserRoles { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
-        public DbSet<Image> Images { get; set; }
+        public DbSet<FileEntity> FileEntities { get; set; }
         #endregion
 
 
@@ -69,6 +69,12 @@ namespace WebCoreAPI.DbContext
                     .HasForeignKey(ur => ur.RoleId)
                     .IsRequired();
             });
+
+            modelBuilder.Entity<Product>()
+            .Property(e => e.ImageUrls)
+            .HasConversion(
+                v => string.Join(',', v),
+                v => v.Split(',', StringSplitOptions.RemoveEmptyEntries));
         }
     }
 }

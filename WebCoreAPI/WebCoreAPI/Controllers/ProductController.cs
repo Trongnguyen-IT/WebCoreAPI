@@ -22,8 +22,8 @@ namespace WebCoreAPI.Controllers
         }
 
         [HttpGet]
-        [Authorize]
-        public async Task<IActionResult> GetAll()
+        //[Authorize]
+        public async Task<IActionResult> Get()
         {
             var result = await _productService.GetAll();
             return Ok(result);

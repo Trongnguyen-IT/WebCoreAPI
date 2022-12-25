@@ -2,7 +2,7 @@ import axios from "axios";
 
 const httpRequest = axios.create({
   baseURL: process.env.REACT_APP_API_ENDPOINT,
-  timeout: 3000,
+  timeout: 30000,
 });
 
 httpRequest.defaults.headers.common['Authorization'] = 'AUTH_TOKEN';

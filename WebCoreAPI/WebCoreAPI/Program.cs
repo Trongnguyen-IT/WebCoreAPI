@@ -14,7 +14,6 @@ using WebCoreAPI.Models;
 using WebCoreAPI.Models.Auth;
 using WebCoreAPI.Permission;
 using WebCoreAPI.Repositories;
-using WebCoreAPI.Repositories.Common;
 using WebCoreAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -74,16 +73,18 @@ builder.Services.AddScoped<IServiceProvider, ServiceProvider>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
-//builder.Services.AddScoped<IUserService, UserService>();
-//builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUploadImageService, UploadImageService>();
+builder.Services.AddScoped<IFileService, FileService>();
+
+builder.Services.AddScoped<IFileRepository, FileRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-builder.Services.AddScoped<IImageUploadRepository, ImageUploadRepository>();
-builder.Services.AddScoped<IUploadImageService, UploadImageService>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
 builder.Services.AddScoped(typeof(IGenericDbContext<>), typeof(GenericDbContext<>));
 builder.Services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
 builder.Services.AddTransient<IHttpContextCurrentUser, HttpContextCurrentUser>();
+
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 builder.Services.Configure<StoreAccountAppSettings>(builder.Configuration.GetSection("StoreAccount"));
 var secretKey = builder.Configuration["AppSettings:SecretKey"];
@@ -152,10 +153,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
 app.Run();

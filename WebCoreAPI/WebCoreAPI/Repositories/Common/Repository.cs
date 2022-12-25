@@ -4,18 +4,19 @@ using System.Linq.Expressions;
 using WebCoreAPI.DbContext;
 using WebCoreAPI.Entity;
 
-namespace WebCoreAPI.Repositories.Common
+namespace WebCoreAPI.Repositories
 {
     public class Repository<T> : IRepository<T> where T : class, IKeyEntity<int>
     {
-        private AppDbContext _dbContext;
-        private DbSet<T> table;
+        private readonly AppDbContext _dbContext;
+        private readonly DbSet<T> table;
 
         public Repository(AppDbContext dbContext)
         {
             _dbContext = dbContext;
             table = _dbContext.Set<T>();
         }
+
         public void Delete(object id)
         {
             T existing = table.Find(id);

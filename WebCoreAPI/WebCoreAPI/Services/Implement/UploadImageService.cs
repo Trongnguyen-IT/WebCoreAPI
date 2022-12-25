@@ -12,18 +12,16 @@ namespace WebCoreAPI.Services
     public class UploadImageService : IUploadImageService
     {
         private readonly StoreAccountAppSettings _storeAccountAppSettings;
-        private readonly IImageUploadRepository _imageUploadRepository;
+        public static IWebHostEnvironment _environment;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public UploadImageService(IOptions<StoreAccountAppSettings> options,
-            IImageUploadRepository imageUploadRepositor)
+            IWebHostEnvironment environment,
+            IHttpContextAccessor httpContextAccessor)
         {
             _storeAccountAppSettings = options.Value;
-            _imageUploadRepository = imageUploadRepositor;
-        }
-
-        public async Task<IEnumerable<Image>> GetAllAsync()
-        {
-            return await _imageUploadRepository.GetAll().ToListAsync();
+            _environment = environment;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         private async Task<IEnumerable<BlobItem>> ListBlobsHierarchicalListing(BlobContainerClient container,
@@ -120,14 +118,26 @@ namespace WebCoreAPI.Services
             return container;
         }
 
-        public async Task CreateImage(ImageCreateOrUpdateDto input)
+        public async Task<string> Upload(IFormFile file)
         {
-            await _imageUploadRepository.InsertAsync(new Entity.Image
+            var vituralPath = "\\images\\";
+            string serverPath = $"{_environment.WebRootPath}{vituralPath}";
+            if (!Directory.Exists(serverPath))
             {
-                Name = input.Name,
-                Description = input.Description,
-                Url = input.Url
-            });
+                Directory.CreateDirectory(serverPath);
+            }
+            var fileName = $"{file.Name}_{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+            var serverFilePath = Path.Combine(serverPath, fileName);
+            await using (var fileStream = File.Create(serverFilePath))
+            {
+                file.CopyTo(fileStream);
+                fileStream.Close();
+            }
+
+            var scheme = _httpContextAccessor.HttpContext?.Request?.Scheme;
+            var baseUrl = _httpContextAccessor.HttpContext?.Request?.Host.Value;
+
+            return $"{vituralPath}{fileName}";
         }
     }
 }
