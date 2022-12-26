@@ -4,8 +4,8 @@
     {
         public string? Name { get; set; }
         public double Price { get; set; }
-        public string? ImageUrl { get; set; }
-        public int Promotion { get; set; }
+        public string? AvatarUrl { get; set; }
+        public int? Promotion { get; set; }
         public int Quantity { get; set; }
         public int? CategoryId { get; set; }
         public CategoryViewModel? Category { get; set; }
