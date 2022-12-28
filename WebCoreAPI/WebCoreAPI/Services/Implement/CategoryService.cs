@@ -12,15 +12,15 @@ namespace WebCoreAPI.Services
         {
             _categoryRepository = categoryRepository;
         }
-        public void Create(CategoryCreateModel model)
+
+        public async Task Create(CategoryCreateModel model)
         {
             var category = new Category
             {
                 Name = model.Name
             };
 
-            _categoryRepository.Insert(category);
-            _categoryRepository.Save();
+            await _categoryRepository.InsertAsync(category);
         }
 
         public async Task<IEnumerable<Category>> GetAll()
@@ -33,7 +33,7 @@ namespace WebCoreAPI.Services
             return _categoryRepository.GetById(id);
         }
 
-        public void Update(int id, CategoryCreateModel model)
+        public async Task Update(int id, CategoryCreateModel model)
         {
             var category = _categoryRepository.GetById(id);
             if (category != null)
@@ -41,15 +41,13 @@ namespace WebCoreAPI.Services
                 category.Name = model.Name;
                 category.LastModified = DateTime.Now;
 
-                _categoryRepository.Update(category);
-                _categoryRepository.Save();
+                await _categoryRepository.UpdateAsync(category);
             }
         }
 
-        public void Delete(int id)
+        public async Task Delete(int id)
         {
-            _categoryRepository.Delete(id);
-            _categoryRepository.Save();
+            await _categoryRepository.DeleteAsync(id);
         }
     }
 }

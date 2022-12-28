@@ -7,8 +7,8 @@ namespace WebCoreAPI.Services
     {
         Task<IEnumerable<Category>> GetAll();
         Category GetOne(int id);
-        void Create(CategoryCreateModel model);
-        void Update(int id, CategoryCreateModel model);
-        void Delete(int id);
+        Task Create(CategoryCreateModel model);
+        Task Update(int id, CategoryCreateModel model);
+        Task Delete(int id);
     }
 }

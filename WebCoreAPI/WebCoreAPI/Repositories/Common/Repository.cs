@@ -17,17 +17,11 @@ namespace WebCoreAPI.Repositories
             table = _dbContext.Set<T>();
         }
 
-        public void Delete(object id)
-        {
-            T existing = table.Find(id);
-            table.Remove(existing);
-        }
-
         public IQueryable<T> GetAll()
         {
             return table.AsQueryable();
         }
-        
+
         public virtual IQueryable<T> FindBy(Expression<Func<T, bool>> predicate)
         {
             return table.Where(predicate);
@@ -46,24 +40,40 @@ namespace WebCoreAPI.Repositories
 
         public void Insert(T obj)
         {
-            table.Add(obj);
+            _dbContext.Set<T>().Add(obj);
+            _dbContext.SaveChanges();
         }
-        
-        public async Task InsertAsync (T obj)
+
+        public async Task InsertAsync(T obj)
         {
             table.Add(obj);
             await _dbContext.SaveChangesAsync();
-        }
-
-        public void Save()
-        {
-            _dbContext.SaveChanges();
         }
 
         public void Update(T obj)
         {
             table.Attach(obj);
             _dbContext.Entry(obj).State = EntityState.Modified;
+        }
+
+        public async Task UpdateAsync(T entity)
+        {
+            _dbContext.Entry(entity).State = EntityState.Modified;
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public void Delete(object id)
+        {
+            T existing = table.Find(id);
+            table.Remove(existing);
+            _dbContext.SaveChanges();
+        }
+
+        public async Task DeleteAsync(object id)
+        {
+            T existing = table.Find(id);
+            table.Remove(existing);
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

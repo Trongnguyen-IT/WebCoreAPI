@@ -55,7 +55,7 @@ namespace WebCoreAPI.Services
             return productView;
         }
 
-        public void Create(CreateProductModel model)
+        public async Task CreateAsync(CreateProductModel model)
         {
             var product = new Product
             {
@@ -67,11 +67,10 @@ namespace WebCoreAPI.Services
                 AvatarUrl = model.AvatarUrl,
                 ImageUrls = model.ImageUrls
             };
-            _productRepository.Insert(product);
-            _productRepository.Save();
+            await _productRepository.InsertAsync(product);
         }
 
-        public void Update(int id, CreateProductModel model)
+        public async Task UpdateAsync(int id, CreateProductModel model)
         {
             var product = _productRepository.GetById(id);
             if (product != null)
@@ -85,15 +84,13 @@ namespace WebCoreAPI.Services
                 product.AvatarUrl = model.AvatarUrl;
                 product.ImageUrls = model.ImageUrls;
 
-                _productRepository.Update(product);
-                _productRepository.Save();
+                await _productRepository.UpdateAsync(product);
             }
         }
 
-        public void Delete(int id)
+        public async Task DeleteAsync(int id)
         {
-            _productRepository.Delete(id);
-            _productRepository.Save();
+            await _productRepository.DeleteAsync(id);
         }
     }
 }

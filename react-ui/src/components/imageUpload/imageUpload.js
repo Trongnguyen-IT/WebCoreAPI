@@ -61,11 +61,13 @@ export default function ImageUpload({ onSetUrl }) {
           mb: 2,
         }}
       >
-        <img
-          style={{ width: "100%", height: "100%" }}
-          alt={url}
-          src={`${GetUrl(url)}?w=248&fit=crop&auto=format&dpr=2 2x`}
-        />
+        {url && (
+          <img
+            style={{ width: "100%", height: "100%" }}
+            alt={url}
+            src={`${GetUrl(url)}?w=248&fit=crop&auto=format&dpr=2 2x`}
+          />
+        )}
         <Stack
           direction="row"
           justifyContent="center"

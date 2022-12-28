@@ -8,8 +8,8 @@ namespace WebCoreAPI.Services
     {
         Task<IEnumerable<Product>> GetAll();
         ProductViewmodel GetOne(int id);
-        void Create(CreateProductModel model);
-        void Update(int id, CreateProductModel product);
-        void Delete(int id);
+        Task CreateAsync(CreateProductModel model);
+        Task UpdateAsync(int id, CreateProductModel product);
+        Task DeleteAsync(int id);
     }
 }

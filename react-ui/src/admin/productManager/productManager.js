@@ -1,13 +1,13 @@
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Stack from "@mui/material/Stack";
-import Container from "@mui/material/Container";
-import ImageList from "@mui/material/ImageList";
-import ImageListItem from "@mui/material/ImageListItem";
-import ImageListItemBar from "@mui/material/ImageListItemBar";
 import { useEffect, useState } from "react";
-import { getImages, uploadImage } from "~/services/photoManagerService";
-import { getProducts, createProduct } from "~/services/productService";
+import {
+  getProducts,
+  getById,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+} from "~/services/productService";
 import GetUrl from "~/utilities/getUrl";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -15,8 +15,12 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
+import IconButton from "@mui/material/IconButton";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 import Paper from "@mui/material/Paper";
 import { ProductCreateOrUpdate } from "~/admin/productManager";
+import { apiStatus } from "~/enums/apiStatus";
 
 function createData(name, calories, fat, carbs, protein) {
   return {
@@ -57,6 +61,19 @@ export default function ProductManager() {
     setOpen(false);
   };
 
+  const handleEdit = async (id) => {
+    const result = await getById("Product", id);
+  };
+
+  const handleDelete = async (id) => {
+    const result = await deleteProduct("Product", id);
+    if (result.status === apiStatus.success) {
+      setProducts((prev) => {
+        return prev.filter((p) => p.id !== id);
+      });
+    }
+  };
+
   const loadData = async () => {
     const param = {
       name: "abc",
@@ -68,18 +85,19 @@ export default function ProductManager() {
 
   return (
     <Box>
-      <Button variant="outlined" onClick={handleClickOpen} sx={{mb:2}}>
+      <Button variant="outlined" onClick={handleClickOpen} sx={{ mb: 2 }}>
         Create
       </Button>
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
-            <TableRow>
+            <TableRow sx={{ backgroundColor: "#ccc" }}>
               <TableCell>Product Name</TableCell>
+              <TableCell align="right">Image</TableCell>
               <TableCell align="right">Description</TableCell>
               <TableCell align="right">Price</TableCell>
               <TableCell align="right">Quantity</TableCell>
-              <TableCell align="right">Image</TableCell>
+              <TableCell align="right">Action</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -91,16 +109,45 @@ export default function ProductManager() {
                 <TableCell component="th" scope="row">
                   {row.name}
                 </TableCell>
+                <TableCell align="right">
+                  <img
+                    src={GetUrl(row.avatarUrl)}
+                    alt={row.avatarUrl}
+                    css={{
+                      objectFit: "contain",
+                      maxWidth: "125px",
+                    }}
+                  />
+                </TableCell>
                 <TableCell align="right">{row.description}</TableCell>
                 <TableCell align="right">{row.price}</TableCell>
                 <TableCell align="right">{row.quantity}</TableCell>
-                <TableCell align="right">{row.quantity}</TableCell>
+                <TableCell align="right">
+                  <IconButton
+                    aria-label="edit"
+                    color="primary"
+                    onClick={() => handleEdit(row.id)}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
+                    aria-label="delete"
+                    color="error"
+                    onClick={() => handleDelete(row.id)}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
-      <ProductCreateOrUpdate open={open} onClose={handleClose} onLoadData={loadData}/>
+      <ProductCreateOrUpdate
+        open={open}
+        onClose={handleClose}
+        onLoadData={loadData}
+      />
     </Box>
   );
 }

@@ -5,6 +5,8 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from '@mui/icons-material/Close';
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import { useState } from "react";
@@ -47,8 +49,24 @@ export default function ProductCreateOrUpdate({ open, onClose, onLoadData }) {
 
   return (
     <React.Fragment>
-      <Dialog fullWidth maxWidth="lg" open={open} onClose={handleClose}>
-        <DialogTitle>Product manager</DialogTitle>
+      <Dialog fullWidth maxWidth="md" open={open} onClose={handleClose}>
+        <DialogTitle>
+          Product manager
+          {onClose ? (
+            <IconButton
+              aria-label="close"
+              onClick={onClose}
+              sx={{
+                position: "absolute",
+                right: 8,
+                top: 8,
+                color: (theme) => theme.palette.grey[500],
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          ) : null}
+        </DialogTitle>
         <DialogContent>
           <Box
             sx={{

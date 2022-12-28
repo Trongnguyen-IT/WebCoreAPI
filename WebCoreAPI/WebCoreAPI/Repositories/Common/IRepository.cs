@@ -12,6 +12,7 @@ namespace WebCoreAPI.Repositories
         Task InsertAsync(T obj);
         void Update(T obj);
         void Delete(object id);
-        void Save();
+        Task UpdateAsync(T obj);
+        Task DeleteAsync(object id);
     }
 }

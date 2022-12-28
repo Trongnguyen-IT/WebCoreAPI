@@ -36,23 +36,23 @@ namespace WebCoreAPI.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(CreateProductModel model)
+        public async Task<IActionResult> Create(CreateProductModel model)
         {
-            _productService.Create(model);
+            await _productService.CreateAsync(model);
             return Ok();
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, CreateProductModel model)
+        public async Task<IActionResult> Update(int id, CreateProductModel model)
         {
-            _productService.Update(id, model);
+            await _productService.UpdateAsync(id, model);
             return Ok();
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            _productService.Delete(id);
+            await _productService.DeleteAsync(id);
             return Ok();
         }
     }
