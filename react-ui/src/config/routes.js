@@ -1,4 +1,5 @@
 const routes = {
+    signIn: '/sign-in',
     home: '/',
     product: '/product',
     uploadImage: '/upload-image',

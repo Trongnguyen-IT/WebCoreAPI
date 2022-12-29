@@ -129,5 +129,13 @@ namespace WebCoreAPI.Controllers
             }
             return BadRequest();
         }
+
+        [HttpGet]
+        [Authorize]
+        [Route("GetProfile")]
+        public async Task<IActionResult> GetProfile()
+        {
+            return Ok("Profile");
+        }
     }
 }

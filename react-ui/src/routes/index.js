@@ -1,6 +1,7 @@
 import Home from "~/pages/home";
 import Product from "~/pages/product";
 import Contact from "~/pages/contact";
+import SignIn from "~/pages/signIn";
 import PhotoManager from "~/components/photoManager";
 import ProductManager from "~/admin/productManager";
 import config from "~/config";
@@ -32,6 +33,12 @@ const publicRoutes = [
     name: "Product Manager",
     component: ProductManager,
     layout: "admin",
+  },
+  {
+    path: config.routes.signIn,
+    name: "Sign In",
+    component: SignIn,
+    layout: null,
   },
 ];
 
