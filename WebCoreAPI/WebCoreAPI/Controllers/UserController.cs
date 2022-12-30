@@ -12,7 +12,6 @@ using WebCoreAPI.Entity;
 using WebCoreAPI.Enum;
 using WebCoreAPI.Models;
 using WebCoreAPI.Models.Auth;
-using WebCoreAPI.Models.Permission;
 
 namespace WebCoreAPI.Controllers
 {
@@ -25,18 +24,21 @@ namespace WebCoreAPI.Controllers
         private readonly UserManager<AppUser> _userManager;
         public readonly IPasswordHasher<AppUser> _passwordHasher;
         public readonly IGenericDbContext<AppDbContext> _dbContext;
+        private readonly IHttpContextCurrentUser _httpContextCurrentUser;
 
         public UserController(IOptionsMonitor<AppSettings> optionsMonitor,
             //IUserService userService,
             UserManager<AppUser> userManager,
             IPasswordHasher<AppUser> passwordHasher,
-            IGenericDbContext<AppDbContext> dbContext)
+            IGenericDbContext<AppDbContext> dbContext,
+            IHttpContextCurrentUser httpContextCurrentUser)
         {
             _appSettings = optionsMonitor.CurrentValue;
             //_userService = userService;
             _userManager = userManager;
             _passwordHasher = passwordHasher;
             _dbContext = dbContext;
+            _httpContextCurrentUser = httpContextCurrentUser;
         }
 
         [HttpGet]
@@ -59,12 +61,6 @@ namespace WebCoreAPI.Controllers
                 return Unauthorized();
             if (await _userManager.CheckPasswordAsync(user, input.Password))
             {
-                var permissions = (from s in _dbContext.Repository<AppUserRole>().AsNoTracking()
-                                   join sa in _dbContext.Repository<IdentityRoleClaim<int>>().AsNoTracking() on s.RoleId equals sa.RoleId
-                                   where s.UserId == user.Id && sa.ClaimType == "Permission" //Permissions.Type
-                                   select sa.ClaimValue)
-                            .ToList();
-
                 var roleName = (from s in _dbContext.Repository<AppUserRole>()
                                 join sa in _dbContext.Repository<AppRole>() on s.RoleId equals sa.Id
                                 where s.UserId == user.Id
@@ -88,22 +84,18 @@ namespace WebCoreAPI.Controllers
                     audience: audience,
                     signingCredentials: credentials,
                     claims: claims,
-                    expires: DateTime.UtcNow.AddHours(24));
+                    expires: DateTime.UtcNow.AddSeconds(30));
 
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var accessToken = tokenHandler.WriteToken(token);
                 return Ok(new
                 {
                     accessToken,
-                    user.Email,
-                    user.FullName,
-                    roleName,
-                    permissions,
                     user.IsFirstTimeLogin
                 });
             }
 
-            return Ok(user);
+            return Unauthorized();
         }
 
         [HttpPost]
@@ -135,7 +127,31 @@ namespace WebCoreAPI.Controllers
         [Route("GetProfile")]
         public async Task<IActionResult> GetProfile()
         {
-            return Ok("Profile");
+            var userId = _httpContextCurrentUser.UserId;
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user != null)
+            {
+                var permissions = (from s in _dbContext.Repository<AppUserRole>().AsNoTracking()
+                                   join sa in _dbContext.Repository<IdentityRoleClaim<int>>().AsNoTracking() on s.RoleId equals sa.RoleId
+                                   where s.UserId == user.Id && sa.ClaimType == "Permission" //Permissions.Type
+                                   select sa.ClaimValue)
+                            .ToList();
+
+                var roleName = (from s in _dbContext.Repository<AppUserRole>()
+                                join sa in _dbContext.Repository<AppRole>() on s.RoleId equals sa.Id
+                                where s.UserId == user.Id
+                                select sa.Name).FirstOrDefault();
+                return Ok(new
+                {
+                    user.Email,
+                    user.FullName,
+                    roleName,
+                    permissions,
+                    user.IsFirstTimeLogin
+                });
+            }
+            return Unauthorized();
         }
     }
 }

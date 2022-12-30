@@ -1,7 +1,6 @@
 import * as React from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
@@ -14,6 +13,8 @@ import Container from "@mui/material/Container";
 import { authentication } from "~/services/authService";
 import { apiStatus } from "~/enums/apiStatus";
 import { getProfile } from "~/services/userService";
+import { localStoredKey } from "~/enums/localStoredKey";
+import { getToken, setToken } from "~/utilities/localStoredManager";
 
 function Copyright(props) {
   return (
@@ -34,24 +35,27 @@ function Copyright(props) {
 }
 
 export default function Signin() {
+  const token = getToken(localStoredKey.accessToken)
+  if (token) {
+    const { data: profile } = getProfile("User/GetProfile");
+  }
   const handleSubmit = async (event) => {
     event.preventDefault();
     const input = new FormData(event.currentTarget);
-    const { status, data } = await authentication("User/Login", {
+    const { status, data: { accessToken } } = await authentication("User/Login", {
       userName: input.get("userName"),
       password: input.get("password"),
     });
-    console.log("authentication", data);
+
     if (status === apiStatus.success) {
-      localStorage.setItem("token", data.accessToken);
-      const { status, data } = await getProfile("User/GetProfile");
-      console.log("getProfile", data);
+      setToken(localStoredKey.accessToken, accessToken)
+      const { data: profile } = await getProfile("User/GetProfile");
+      console.log("getProfile", profile);
     }
   };
 
   return (
     <Container component="main" maxWidth="xs">
-      <CssBaseline />
       <Box
         sx={{
           marginTop: 8,
