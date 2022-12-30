@@ -14,7 +14,7 @@ import { authentication } from "~/services/authService";
 import { apiStatus } from "~/enums/apiStatus";
 import { getProfile } from "~/services/userService";
 import { localStoredKey } from "~/enums/localStoredKey";
-import { getToken, setToken } from "~/utilities/localStoredManager";
+import { setToken } from "~/utilities/localStoredManager";
 
 function Copyright(props) {
   return (
@@ -35,10 +35,6 @@ function Copyright(props) {
 }
 
 export default function Signin() {
-  const token = getToken(localStoredKey.accessToken)
-  if (token) {
-    const { data: profile } = getProfile("User/GetProfile");
-  }
   const handleSubmit = async (event) => {
     event.preventDefault();
     const input = new FormData(event.currentTarget);
