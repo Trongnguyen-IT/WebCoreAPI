@@ -1,7 +1,7 @@
-import httpRequest from "~/utilities/httpRequest";
+import httpRequest, { authHttpRequest } from "~/utilities/httpRequest";
 
 const getProfile = (url) => {
-  return httpRequest.get(url);
+  return authHttpRequest.get(url);
 };
 
 export { getProfile };

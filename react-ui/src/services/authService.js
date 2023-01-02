@@ -4,4 +4,8 @@ const authentication = (url, data) => {
   return httpRequest.post(url, data);
 };
 
-export { authentication };
+const refreshAccessToken = (url, data) => {
+  return httpRequest.post(url, data);
+};
+
+export { authentication, refreshAccessToken };

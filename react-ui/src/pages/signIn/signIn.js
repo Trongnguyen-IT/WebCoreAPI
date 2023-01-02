@@ -15,6 +15,7 @@ import { apiStatus } from "~/enums/apiStatus";
 import { getProfile } from "~/services/userService";
 import { localStoredKey } from "~/enums/localStoredKey";
 import { setToken } from "~/utilities/localStoredManager";
+import { useNavigate } from "react-router-dom";
 
 function Copyright(props) {
   return (
@@ -35,16 +36,19 @@ function Copyright(props) {
 }
 
 export default function Signin() {
+  const navigate =useNavigate()
   const handleSubmit = async (event) => {
     event.preventDefault();
     const input = new FormData(event.currentTarget);
-    const { status, data: { accessToken } } = await authentication("User/Login", {
+    const { status, data: { accessToken,refreshToken } } = await authentication("User/Login", {
       userName: input.get("userName"),
       password: input.get("password"),
     });
 
     if (status === apiStatus.success) {
       setToken(localStoredKey.accessToken, accessToken)
+      setToken(localStoredKey.refreshToken, refreshToken)
+      navigate('/')
       const { data: profile } = await getProfile("User/GetProfile");
       console.log("getProfile", profile);
     }

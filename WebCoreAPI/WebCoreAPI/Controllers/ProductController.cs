@@ -22,7 +22,7 @@ namespace WebCoreAPI.Controllers
         }
 
         [HttpGet]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> Get()
         {
             var result = await _productService.GetAll();
