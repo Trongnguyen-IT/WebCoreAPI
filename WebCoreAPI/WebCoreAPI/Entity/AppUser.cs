@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.Text.Json.Serialization;
 using WebCoreAPI.Enum;
 
 namespace WebCoreAPI.Entity
@@ -17,5 +18,7 @@ namespace WebCoreAPI.Entity
         public virtual ICollection<IdentityUserLogin<int>> Logins { get; set; }
         public virtual ICollection<IdentityUserToken<int>> Tokens { get; set; }
         public virtual ICollection<AppUserRole> UserRoles { get; set; }
+        public string? RefreshToken { get; set; }
+        public DateTime RefreshTokenExpiryTime { get; set; }
     }
 }

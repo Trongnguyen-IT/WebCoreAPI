@@ -5,12 +5,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using WebCoreAPI.DbContext;
 using WebCoreAPI.Entity;
 using WebCoreAPI.Enum;
+using WebCoreAPI.Migrations;
 using WebCoreAPI.Models;
 using WebCoreAPI.Models.Auth;
 
@@ -62,12 +64,18 @@ namespace WebCoreAPI.Controllers
                 return Unauthorized();
             if (await _userManager.CheckPasswordAsync(user, input.Password))
             {
-                var tokenModel = await GenerateToken(user);
+                var accessToken = GenerateToken(user);
+                var refreshToken = GenerateRefreshToken();
+
+                user.RefreshToken = refreshToken;
+                user.RefreshTokenExpiryTime = DateTime.Now.AddSeconds(60);
+
+                await _userManager.UpdateAsync(user);
+
                 return Ok(new
                 {
-                    tokenModel.AccessToken,
-                    tokenModel.RefreshToken,
-                    user.IsFirstTimeLogin
+                    accessToken = accessToken,
+                    refreshToken = refreshToken
                 });
             }
 
@@ -130,7 +138,75 @@ namespace WebCoreAPI.Controllers
             return Unauthorized();
         }
 
-        private async Task<TokenModel> GenerateToken(AppUser user)
+        [HttpPost("RefreshToken")]
+        public async Task<IActionResult> RefreshToken(TokenModel tokenModel)
+        {
+            if (tokenModel is null)
+            {
+                return BadRequest("Invalid client request");
+            }
+
+            string? accessToken = tokenModel.AccessToken;
+            string? refreshToken = tokenModel.RefreshToken;
+
+            var principal = GetPrincipalFromExpiredToken(accessToken);
+            if (principal == null)
+            {
+                return BadRequest("Invalid access token or refresh token");
+            }
+            //var user = _dbContext.Repository<AppUser>().SingleOrDefault(u => u.RefreshToken == refreshToken);
+            string username = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var user = await _userManager.FindByNameAsync(username);
+
+            if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.Now)
+            {
+                return BadRequest("Invalid access token or refresh token");
+            }
+
+            var newAccessToken = GenerateToken(user);
+            var newRefreshToken = GenerateRefreshToken();
+
+            user.RefreshToken = newRefreshToken;
+            await _userManager.UpdateAsync(user);
+
+            return Ok(new
+            {
+                accessToken = newAccessToken,
+                refreshToken = newRefreshToken
+            });
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route("revoke/{username}")]
+        public async Task<IActionResult> Revoke(string username)
+        {
+            var user = await _userManager.FindByNameAsync(username);
+            if (user == null) return BadRequest("Invalid user name");
+
+            user.RefreshToken = null;
+            await _userManager.UpdateAsync(user);
+
+            return Ok();
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route("revoke-all")]
+        public async Task<IActionResult> RevokeAll()
+        {
+            var users = _userManager.Users.ToList();
+            foreach (var user in users)
+            {
+                user.RefreshToken = null;
+                await _userManager.UpdateAsync(user);
+            }
+
+            return Ok();
+        }
+
+        private string GenerateToken(AppUser user)
         {
             var roleName = (from s in _dbContext.Repository<AppUserRole>()
                             join sa in _dbContext.Repository<AppRole>() on s.RoleId equals sa.Id
@@ -156,168 +232,53 @@ namespace WebCoreAPI.Controllers
                 audience: audience,
                 signingCredentials: credentials,
                 claims: claims,
-                expires: DateTime.UtcNow.AddSeconds(30));
+                expires: DateTime.UtcNow.AddSeconds(10));
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var accessToken = tokenHandler.WriteToken(token);
-            var refreshToken = GenerateRefreshToken();
 
-            //Lưu database
-            var refreshTokenEntity = new RefreshToken
-            {
-                UserId = user.Id,
-                Token = refreshToken,
-                IsUsed = false,
-                IsRevoked = false,
-                IssuedAt = DateTime.UtcNow,
-                ExpiredAt = DateTime.UtcNow.AddHours(1)
-            };
-
-            await _dbContext.Repository<RefreshToken>().AddAsync(refreshTokenEntity);
-            await _dbContext.SaveChangesAsync();
-
-            return new TokenModel
-            {
-                AccessToken = accessToken,
-                RefreshToken = refreshToken
-            };
+            return accessToken;
         }
 
         private string GenerateRefreshToken()
         {
-            var random = new byte[32];
-            using (var rng = RandomNumberGenerator.Create())
-            {
-                rng.GetBytes(random);
+            var refreshToken = getUniqueToken();
 
-                return Convert.ToBase64String(random);
+            return refreshToken;
+
+            string getUniqueToken()
+            {
+                // token is a cryptographically strong random sequence of values
+                var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+                // ensure token is unique by checking against db
+                var tokenIsUnique = !_dbContext.Repository<AppUser>().Any(u => u.RefreshToken == token);
+
+                if (!tokenIsUnique)
+                    return getUniqueToken();
+
+                return token;
             }
         }
 
-        [HttpPost("RefreshToken")]
-        public async Task<IActionResult> RefreshToken(TokenModel model)
+        private ClaimsPrincipal? GetPrincipalFromExpiredToken(string? token)
         {
-            var jwtTokenHandler = new JwtSecurityTokenHandler();
-            var issuer = _appSettings.Issuer;
-            var audience = _appSettings.Audience;
-
-            var tokenValidateParam = new TokenValidationParameters
+            var tokenValidationParameters = new TokenValidationParameters
             {
-                ValidIssuer = issuer,
-                ValidAudience = audience,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.SecretKey)),
-                ValidateIssuer = true,
+                ValidIssuer =_appSettings.Issuer,
+                ValidAudience = _appSettings.Audience,
                 ValidateAudience = true,
+                ValidateIssuer = true,
                 ValidateIssuerSigningKey = true,
-                ClockSkew = TimeSpan.Zero,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.SecretKey)),
                 ValidateLifetime = false
             };
 
-            try
-            {
-                //check 1: AccessToken valid format
-                var tokenInVerification = jwtTokenHandler.ValidateToken(model.AccessToken, tokenValidateParam, out var validatedToken);
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+            if (securityToken is not JwtSecurityToken jwtSecurityToken || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                throw new SecurityTokenException("Invalid token");
 
-                //check 2: Check alg
-                if (validatedToken is JwtSecurityToken jwtSecurityToken)
-                {
-                    var result = jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase);
-                    if (!result)//false
-                    {
-                        return Ok(new ApiResponse<object>
-                        {
-                            Status = false,
-                            Message = "Invalid token"
-                        });
-                    }
-                }
-
-                //check 3: Check accessToken expire?
-                var utcExpireDate = long.Parse(tokenInVerification.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
-
-                var expireDate = ConvertUnixTimeToDateTime(utcExpireDate);
-                if (expireDate > DateTime.UtcNow)
-                {
-                    return Ok(new ApiResponse<object>
-                    {
-                        Status = false,
-                        Message = "Access token has not yet expired"
-                    });
-                }
-
-                //check 4: Check refreshtoken exist in DB
-                var storedToken = _dbContext.Repository<RefreshToken>().FirstOrDefault(x => x.Token == model.RefreshToken);
-                if (storedToken == null)
-                {
-                    return Ok(new ApiResponse<object>
-                    {
-                        Status = false,
-                        Message = "Refresh token does not exist"
-                    });
-                }
-
-                //check 5: check refreshToken is used/revoked?
-                if (storedToken.IsUsed)
-                {
-                    return Ok(new ApiResponse<object>
-                    {
-                        Status = false,
-                        Message = "Refresh token has been used"
-                    });
-                }
-                if (storedToken.IsRevoked)
-                {
-                    return Ok(new ApiResponse<object>
-                    {
-                        Status = false,
-                        Message = "Refresh token has been revoked"
-                    });
-                }
-
-                ////check 6: AccessToken id == JwtId in RefreshToken
-                //var jti = tokenInVerification.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti).Value;
-                //if (storedToken.JwtId != jti)
-                //{
-                //    return Ok(new ApiResponse<object>
-                //    {
-                //        Status = false,
-                //        Message = "Token doesn't match"
-                //    });
-                //}
-
-                //Update token is used
-                storedToken.IsRevoked = true;
-                storedToken.IsUsed = true;
-                _dbContext.Repository<RefreshToken>().Update(storedToken);
-                await _dbContext.SaveChangesAsync();
-
-                //create new token
-                var user = await _dbContext.Repository<AppUser>().SingleOrDefaultAsync(user => user.Id == storedToken.UserId);
-                var token = await GenerateToken(user);
-
-                return Ok(new ApiResponse<object>
-                {
-                    Status = true,
-                    Message = "Refresh token success",
-                    Data = token
-                });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new ApiResponse<object>
-                {
-                    Status = false,
-                    Message = "Something went wrong"
-                });
-            }
-        }
-
-        private DateTime ConvertUnixTimeToDateTime(long utcExpireDate)
-        {
-            var dateTimeInterval = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-            dateTimeInterval.AddSeconds(utcExpireDate).ToUniversalTime();
-
-            return dateTimeInterval;
+            return principal;
         }
     }
 }

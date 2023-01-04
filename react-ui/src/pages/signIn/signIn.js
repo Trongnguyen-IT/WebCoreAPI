@@ -44,7 +44,8 @@ export default function Signin() {
       userName: input.get("userName"),
       password: input.get("password"),
     });
-
+console.log('accessToken',accessToken);
+console.log('refreshToken',refreshToken);
     if (status === apiStatus.success) {
       setToken(localStoredKey.accessToken, accessToken)
       setToken(localStoredKey.refreshToken, refreshToken)

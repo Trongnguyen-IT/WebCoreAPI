@@ -20,7 +20,7 @@ namespace WebCoreAPI.DbContext
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<FileEntity> FileEntities { get; set; }
-        public DbSet<RefreshToken>  RefreshTokens { get; set; }
+        //public DbSet<RefreshToken>  RefreshTokens { get; set; }
         #endregion
 
 

@@ -1,6 +1,6 @@
 import axios from "axios";
 import { localStoredKey } from "~/enums/localStoredKey";
-import { getToken } from "./localStoredManager";
+import { getToken,setToken } from "./localStoredManager";
 import { refreshAccessToken } from "~/services/authService";
 
 const httpRequest = axios.create({
@@ -51,14 +51,23 @@ authHttpRequest.interceptors.response.use(
     const originalRequest = error.config;
     if (error.response.status === 401 && !originalRequest._retry) {
       const token = getToken(localStoredKey.accessToken);
-      const refreshToken = getToken(localStoredKey.refreshToken);
+      const refreshTokenModel = getToken(localStoredKey.refreshToken);
       originalRequest._retry = true;
-      const access_token = await refreshAccessToken("User/RefreshToken", {
+      const {
+        data: {
+          data: { accessToken, refreshToken },
+        },
+      } = await refreshAccessToken("User/RefreshToken", {
         accessToken: token,
-        refreshToken,
+        refreshToken:refreshTokenModel,
       });
+      console.log("access_token", accessToken);
+      console.log("refreshToken", refreshToken);
+
       authHttpRequest.defaults.headers.common["Authorization"] =
-        "Bearer " + access_token;
+        "Bearer " + accessToken;
+      setToken(localStoredKey.accessToken,accessToken);
+      setToken(localStoredKey.refreshToken,refreshToken);
       return authHttpRequest(originalRequest);
     }
 
