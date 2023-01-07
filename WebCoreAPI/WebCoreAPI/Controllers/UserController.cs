@@ -68,7 +68,7 @@ namespace WebCoreAPI.Controllers
                 var refreshToken = GenerateRefreshToken();
 
                 user.RefreshToken = refreshToken;
-                user.RefreshTokenExpiryTime = DateTime.Now.AddSeconds(60);
+                user.RefreshTokenExpiryTime = DateTime.Now.AddDays(_appSettings.RefreshTokenTTL);
 
                 await _userManager.UpdateAsync(user);
 
@@ -232,7 +232,7 @@ namespace WebCoreAPI.Controllers
                 audience: audience,
                 signingCredentials: credentials,
                 claims: claims,
-                expires: DateTime.UtcNow.AddSeconds(10));
+                expires: DateTime.UtcNow.AddHours(3));
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var accessToken = tokenHandler.WriteToken(token);
