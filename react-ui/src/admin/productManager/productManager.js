@@ -21,6 +21,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import Paper from "@mui/material/Paper";
 import { ProductCreateOrUpdate } from "~/admin/productManager";
 import { apiStatus } from "~/enums/apiStatus";
+import { getProfile } from "~/services/userService";
 
 function createData(name, calories, fat, carbs, protein) {
   return {
@@ -79,6 +80,7 @@ export default function ProductManager() {
       name: "abc",
     };
     const result = await getProducts("Product", param);
+    const result1 = await getProfile("User/GetProfile");
     console.log("result", result);
     result && result.data && setProducts(result.data);
   };

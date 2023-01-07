@@ -20,5 +20,8 @@ export const refreshToken = async () => {
     return data;
   } catch (error) {
     console.log("error", error);
+    if(error.request.responseURL.includes('RefreshToken')){
+      window.location.href = '/sign-in';
+    }
   }
 };
