@@ -1,7 +1,7 @@
 import axios from "axios";
 import { localStoredKey } from "~/enums/localStoredKey";
-import { getToken,setToken } from "./localStoredManager";
-import { refreshAccessToken } from "~/services/authService";
+import { getToken } from "./localStoredManager";
+import { refreshToken } from "./refreshToken";
 
 const httpRequest = axios.create({
   baseURL: process.env.REACT_APP_API_ENDPOINT,
@@ -16,15 +16,16 @@ export const authHttpRequest = axios.create({
 // Add a request interceptor
 authHttpRequest.interceptors.request.use(
   function (config) {
-    const token = getToken(localStoredKey.accessToken);
+    const { accessToken = null } = JSON.parse(getToken(localStoredKey.token));
+
     config.headers = {
       ...config.headers,
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${accessToken}`,
       //'Accept': 'application/json',
       //'Content-Type': 'application/x-www-form-urlencoded'
     };
 
-    //console.log('config', config);
+    //console.log("config", config);
 
     // Do something before request is sent
     return config;
@@ -46,28 +47,20 @@ authHttpRequest.interceptors.response.use(
   async (error) => {
     // Any status codes that falls outside the range of 2xx cause this function to trigger
     // Do something with response error
-    console.log("response", error);
+    //console.log("response", error);
 
     const originalRequest = error.config;
     if (error.response.status === 401 && !originalRequest._retry) {
-      const token = getToken(localStoredKey.accessToken);
-      const refreshTokenModel = getToken(localStoredKey.refreshToken);
       originalRequest._retry = true;
-      const {
-        data: {
-          data: { accessToken, refreshToken },
-        },
-      } = await refreshAccessToken("User/RefreshToken", {
-        accessToken: token,
-        refreshToken:refreshTokenModel,
-      });
-      console.log("access_token", accessToken);
-      console.log("refreshToken", refreshToken);
 
-      authHttpRequest.defaults.headers.common["Authorization"] =
-        "Bearer " + accessToken;
-      setToken(localStoredKey.accessToken,accessToken);
-      setToken(localStoredKey.refreshToken,refreshToken);
+      const result = await refreshToken();
+      if (result && result?.accessToken) {
+        originalRequest.headers = {
+          ...originalRequest.headers,
+          Authorization: `Bearer ${result.accessToken}`,
+        };
+      }
+
       return authHttpRequest(originalRequest);
     }
 

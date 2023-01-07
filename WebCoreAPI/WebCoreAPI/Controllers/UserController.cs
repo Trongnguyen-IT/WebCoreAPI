@@ -143,7 +143,7 @@ namespace WebCoreAPI.Controllers
         {
             if (tokenModel is null)
             {
-                return BadRequest("Invalid client request");
+                throw new Exception("Invalid client request");
             }
 
             string? accessToken = tokenModel.AccessToken;
@@ -152,7 +152,7 @@ namespace WebCoreAPI.Controllers
             var principal = GetPrincipalFromExpiredToken(accessToken);
             if (principal == null)
             {
-                return BadRequest("Invalid access token or refresh token");
+                throw new Exception("Invalid access token or refresh token");
             }
             //var user = _dbContext.Repository<AppUser>().SingleOrDefault(u => u.RefreshToken == refreshToken);
             string username = principal.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -161,7 +161,7 @@ namespace WebCoreAPI.Controllers
 
             if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.Now)
             {
-                return BadRequest("Invalid access token or refresh token");
+                throw new Exception("Invalid access token or refresh token");
             }
 
             var newAccessToken = GenerateToken(user);

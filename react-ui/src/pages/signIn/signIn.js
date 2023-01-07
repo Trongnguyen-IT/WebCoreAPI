@@ -40,18 +40,14 @@ export default function Signin() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const input = new FormData(event.currentTarget);
-    const { status, data: { accessToken,refreshToken } } = await authentication("User/Login", {
+    const { status, data } = await authentication("User/Login", {
       userName: input.get("userName"),
       password: input.get("password"),
     });
-console.log('accessToken',accessToken);
-console.log('refreshToken',refreshToken);
     if (status === apiStatus.success) {
-      setToken(localStoredKey.accessToken, accessToken)
-      setToken(localStoredKey.refreshToken, refreshToken)
+      setToken(localStoredKey.token, JSON.stringify(data))
       navigate('/')
       const { data: profile } = await getProfile("User/GetProfile");
-      console.log("getProfile", profile);
     }
   };
 
